@@ -40,9 +40,8 @@ replaceAt i r a@(x:xs)
 
 -- | Safely gets the head of a list.
 safeHead :: [a] -> Maybe a
-safeHead xs = if not $ null xs
-              then Just $ head xs
-              else Nothing
+safeHead xs | not . null $ xs = Just $ head xs
+            | otherwise       = Nothing
 
 -- | Safely gets an item in a list by index.
 safeIndex :: (Integral b) => [a] -> b -> Maybe a
