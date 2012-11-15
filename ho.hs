@@ -27,7 +27,8 @@ newtype Board = Board (A.Array Coords Position) deriving (Show)
 
 clear :: IO ()
 clear = void $ rawSystem cmd []
-    where cmd = if os `elem` ["win32", "mingw32"] then "cls" else "clear"
+    where cmd | os `elem` ["win32", "mingw32"] = "cls"
+              | otherwise                      = "clear"
 
 -- | Replaces an item at the specified index in a list.
 replaceAt :: (Integral a) => a -> b -> [b] -> [b]
