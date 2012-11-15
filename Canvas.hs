@@ -25,7 +25,7 @@ insert n y xs = intercalate [y] . groups $ xs
 -- Data types
 ------------------------------------------------------------------------------
 
-type Coords = (Int, Int)
+type Coords = (Int,Int)
 
 newtype Canvas = Canvas (A.Array Coords Char)
 
