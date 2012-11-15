@@ -1,33 +1,25 @@
-import Data.List (intersperse, elemIndex)
+import Data.Array as A
+import Data.List (elemIndex)
 import System.Cmd (rawSystem)
 import System.Info (os)
 import Control.Monad (void)
-import Data.Function (on)
 
 ------------------------------------------------------------------------------
 -- Data types
 ------------------------------------------------------------------------------
 
 data Position = Empty
-              | Hoshi
               | Black
               | White deriving (Show, Read, Eq)
 
 posToChar :: Position -> Char
 posToChar Empty = '+'
-posToChar Hoshi = 'a'
 posToChar Black = '@'
 posToChar White = 'O'
 
-newtype Line = Line { positions :: [Position] }
+type Coords = (Int,Int)
 
-instance Show Line where
-    show (Line ps) = intersperse ' ' $ map posToChar ps
-
-newtype Board = Board { lines :: [Line] }
-
-instance Show Board where
-    show (Board ls) = concatMap ((++"\n") . show) ls
+newtype Board = Board (A.Array Coords Position) deriving (Show)
 
 ------------------------------------------------------------------------------
 -- Helpers
@@ -66,64 +58,31 @@ safeIndex (x:xs) i
 -- Functions
 ------------------------------------------------------------------------------
 
-clearBoard :: Board
-clearBoard = Board $
-    replicate 3 clearLine ++
-    [hoshiLine] ++
-    replicate 5 clearLine ++
-    [hoshiLine] ++
-    replicate 5 clearLine ++
-    [hoshiLine] ++
-    replicate 3 clearLine
-    where clearLine = Line $ replicate 19 Empty
-          hoshiLine = Line $
-            replicate 3 Empty ++
-            [Hoshi] ++
-            replicate 5 Empty ++
-            [Hoshi] ++
-            replicate 5 Empty ++
-            [Hoshi] ++
-            replicate 3 Empty
-
 coord :: Char -> Maybe Int
-coord = (`elemIndex` ['a'..'s'])
+coord = fmap (+1) . (`elemIndex` ['a'..'s'])
 
-isInside :: Char -> Char -> Bool
-isInside = (&&) `on` coordInRange
-    where coordInRange c = case coord c of
-                           (Just _) -> True
-                           Nothing  -> False
+-- | Gets a board with width `x` and height `y`.
+getBoard :: Coords -> Board
+getBoard (x,y) = Board $ A.listArray ((1,1),(x,y)) (repeat Empty)
 
-isHoshi :: Int -> Int -> Bool
-isHoshi x y = (x, y) `elem` [(p, q) | p <- [3, 9, 15], q <- [3, 9, 15]]
+-- | Gets the position at the specified coordinates.
+getPosition :: Coords -> Board -> Maybe Position
+getPosition (x,y) (Board a)
+    | (x,y) `elem` is = Just $ a ! (x,y)
+    | otherwise       = Nothing
+    where is = A.indices a
 
-getPosition :: Char -> Char -> Board -> Maybe Position
-getPosition x y (Board b) = do
-    iX <- coord x
-    iY <- coord y
-    line <- b !!! iY
-    position <- positions line !!! iX
-    Just position
-
-setPosition :: Char -> Char -> Position -> Board -> Maybe Board
-setPosition x y p (Board b) = do
-    iX <- coord x
-    iY <- coord y
-    let yLine       = b !! iY
-        newPosition | p == Empty && isHoshi iX iY = Hoshi
-                    | p == Hoshi                  = Empty
-                    | otherwise                   = p
-        newLine     = Line $ replaceAt iX newPosition (positions yLine)
-        newBoard    = Board $ replaceAt iY newLine b
-    return newBoard
-
---  moveAt x y p (Board b) =
+-- | Sets the position at the specified coordinates.
+setPosition :: Coords -> Position -> Board -> Maybe Board
+setPosition (x,y) p (Board a)
+    | (x,y) `elem` is = Just $ Board (a // [((x,y),p)])
+    | otherwise       = Nothing
+    where is = A.indices a
 
 ------------------------------------------------------------------------------
 -- Main
 ------------------------------------------------------------------------------
 
-main :: IO ()
-main = do
-    clear
-    print clearBoard
+--  main :: IO ()
+--  main = do
+--      clear
