@@ -19,7 +19,7 @@ import Data.List (intersect, intercalate, unfoldr)
 -- Inserts an item `y` into a list `xs` after every `n` elements.
 insert :: Int -> a -> [a] -> [a]
 insert n y xs = intercalate [y] . groups $ xs
-  where groups = takeWhile (not . null) . unfoldr (Just . splitAt n)
+    where groups = takeWhile (not . null) . unfoldr (Just . splitAt n)
 
 ------------------------------------------------------------------------------
 -- Data types
