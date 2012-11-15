@@ -32,7 +32,7 @@ newtype Canvas = Canvas (A.Array Coords Char)
 instance Show Canvas where
     show (Canvas a)   = insert width '\n' content
         where content = elems a
-              width   = fst $ snd $ A.bounds a
+              width   = fst . snd $ A.bounds a
 
 ------------------------------------------------------------------------------
 -- Canvas functions
