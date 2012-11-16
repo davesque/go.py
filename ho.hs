@@ -1,4 +1,5 @@
-import Data.Array as A
+import Data.Array.IO as A
+import Data.Array.MArray as M
 import Data.List (elemIndex)
 import System.Cmd (rawSystem)
 import System.Info (os)
@@ -19,7 +20,7 @@ posToChar White = 'O'
 
 type Coords = (Int,Int)
 
-newtype Board = Board (A.Array Coords Position) deriving (Show)
+type Board = A.IOArray Coords Position
 
 ------------------------------------------------------------------------------
 -- Helpers
@@ -63,27 +64,23 @@ coord :: Char -> Maybe Int
 coord = fmap (+1) . (`elemIndex` ['a'..'s'])
 
 -- | Gets a board with width `x` and height `y`.
-getBoard :: Coords -> Board
-getBoard (x,y) = Board $ A.listArray ((1,1),(x,y)) (repeat Empty)
+getBoard :: Coords -> IO Board
+getBoard (x,y) = newArray ((1,1),(x,y)) Empty
 
 -- | Gets the position at the specified coordinates.
-getPosition :: Coords -> Board -> Maybe Position
-getPosition (x,y) (Board a)
-    | (x,y) `elem` is = Just $ a ! (x,y)
-    | otherwise       = Nothing
-    where is = A.indices a
+getPosition :: Board -> Coords -> IO Position
+getPosition = readArray
 
 -- | Sets the position at the specified coordinates.
-setPosition :: Coords -> Position -> Board -> Maybe Board
-setPosition (x,y) p (Board a)
-    | (x,y) `elem` is = Just $ Board (a // [((x,y),p)])
-    | otherwise       = Nothing
-    where is = A.indices a
+setPosition :: Board -> Coords -> Position -> IO ()
+setPosition = writeArray
 
 ------------------------------------------------------------------------------
 -- Main
 ------------------------------------------------------------------------------
 
---  main :: IO ()
---  main = do
---      clear
+main :: IO ()
+main = do
+    b <- getBoard (19,19)
+    print b
+    return ()
