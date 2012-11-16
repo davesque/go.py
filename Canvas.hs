@@ -19,7 +19,7 @@ import Data.List (intersect, intercalate, unfoldr)
 -- Inserts an item `y` into a list `xs` after every `n` elements.
 insert :: Int -> a -> [a] -> [a]
 insert n y xs = intercalate [y] . groups $ xs
-  where groups = takeWhile (not . null) . unfoldr (Just . splitAt n)
+    where groups = takeWhile (not . null) . unfoldr (Just . splitAt n)
 
 ------------------------------------------------------------------------------
 -- Data types
@@ -32,7 +32,7 @@ newtype Canvas = Canvas (A.Array Coords Char)
 instance Show Canvas where
     show (Canvas a)   = insert width '\n' content
         where content = elems a
-              width   = fst $ snd $ A.bounds a
+              width   = fst . snd $ A.bounds a
 
 ------------------------------------------------------------------------------
 -- Canvas functions
