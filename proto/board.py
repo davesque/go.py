@@ -1,15 +1,13 @@
+from position import Position
+from canvas import Canvas
+
+
 class BoardCanvas(Canvas):
     HOSHI = '*'
     HOSHIS = [
-        (4, 4),
-        (10, 4),
-        (16, 4),
-        (4, 10),
-        (10, 10),
-        (16, 10),
-        (4, 16),
-        (10, 16),
-        (16, 16),
+        (4, 4), (10, 4), (16, 4),
+        (4, 10), (10, 10), (16, 10),
+        (4, 16), (10, 16), (16, 16),
     ]
 
     def __init__(self, board):
