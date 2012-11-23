@@ -2,7 +2,7 @@ class Position(object):
     COLORS = {
         'black': '@',
         'white': 'O',
-        'empty': '+',
+        'empty': '.',
     }
 
     class PositionError(Exception):

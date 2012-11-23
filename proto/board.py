@@ -4,7 +4,8 @@ from canvas import Canvas
 
 
 class BoardView(Canvas):
-    HOSHI = '\033[1m+\033[0m'
+    # HOSHI = '\033[1m+\033[0m'
+    HOSHI = '+'
     HOSHIS = [
         (4, 4), (10, 4), (16, 4),
         (4, 10), (10, 10), (16, 10),
@@ -34,7 +35,7 @@ class BoardView(Canvas):
         ]
 
         for x, y in self.HOSHIS:
-            if self.get(x, y) == '+':
+            if self.get(x, y) == str(Board.EMPTY):
                 self.set(x, y, self.HOSHI)
 
     def redraw(self):

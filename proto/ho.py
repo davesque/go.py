@@ -49,7 +49,7 @@ def main():
 
         # Print board
         print view
-        print 'Make your move... '
+        sys.stdout.write('Make your move... ')
 
         # Get char
         c = getch()
