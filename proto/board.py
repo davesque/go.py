@@ -1,10 +1,10 @@
 from copy import deepcopy
 from position import Position
 from canvas import Canvas
+from utils import intersperse
 
 
 class BoardView(Canvas):
-    # HOSHI = '\033[1m+\033[0m'
     HOSHI = '+'
     HOSHIS = [
         (4, 4), (10, 4), (16, 4),
@@ -30,7 +30,7 @@ class BoardView(Canvas):
         board_canvas = self._board._canvas
 
         self._canvas = [
-            list(' '.join([str(pos) for pos in row]))
+            intersperse(' ', [str(pos) for pos in row])
             for row in board_canvas
         ]
 

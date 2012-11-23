@@ -38,7 +38,7 @@ def main():
     def liberties():
         global libs
         x, y = view.cursor
-        libs = board.get_liberties(x, y)
+        libs = board.count_liberties(x, y)
 
     KEYS = {
         'w': view.cursor_up,

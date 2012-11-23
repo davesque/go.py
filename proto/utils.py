@@ -2,8 +2,16 @@ import platform
 import subprocess
 
 
+def bold(v):
+    return '\033[1m{0}\033[0m'.format(v)
+
+
 def clear():
     subprocess.check_call('cls' if platform.system() == 'Windows' else 'clear', shell=True)
+
+
+def intersperse(x, xs):
+    return sum([[i, x] for i in xs], [])[:-1]
 
 
 class _Getch:

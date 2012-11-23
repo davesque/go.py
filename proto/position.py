@@ -1,7 +1,10 @@
+from utils import bold
+
+
 class Position(object):
     COLORS = {
-        'black': '@',
-        'white': 'O',
+        'black': bold('@'),
+        'white': bold('O'),
         'empty': '.',
     }
 
