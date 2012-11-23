@@ -28,13 +28,18 @@ class Canvas(object):
                 x=x, y=y, w=self._width, h=self._height
             ))
 
+    def _array_coords(cls, x, y):
+        return x - 1, y - 1
+
     def set(self, x, y, value):
         self._check_coords(x, y)
-        self._canvas[y - 1][x - 1] = value
+        x, y = self._array_coords(x, y)
+        self._canvas[y][x] = value
 
     def get(self, x, y):
         self._check_coords(x, y)
-        return self._canvas[y - 1][x - 1]
+        x, y = self._array_coords(x, y)
+        return self._canvas[y][x]
 
     def __eq__(self, other):
         return self._canvas == other._canvas
