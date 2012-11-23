@@ -6,16 +6,6 @@ from board import Board, BoardView
 from utils import clear, getch
 
 
-KEYS = {
-    'w': 'cursor_up',
-    'r': 'cursor_down',
-    'a': 'cursor_left',
-    's': 'cursor_right',
-    'x': None,
-    '\x1b': None,
-}
-
-
 TURNS = (
     Board.BLACK,
     Board.WHITE,
@@ -41,25 +31,29 @@ def main():
     def exit():
         sys.exit(0)
 
-    KEYS['x'] = move
-    KEYS['\x1b'] = exit
+    KEYS = {
+        'w': view.cursor_up,
+        'r': view.cursor_down,
+        'a': view.cursor_left,
+        's': view.cursor_right,
+        'x': move,
+        '\x1b': exit,
+    }
 
     while True:
-        clear()
-
         # Print board
+        clear()
         print view
-        sys.stdout.write('Make your move... ')
+        sys.stdout.write('{0}\'s move... '.format(repr(turn)))
 
-        # Get char
+        # Get action
         c = getch()
 
-        # Move cursor
         try:
-            getattr(view, KEYS[c])()
-        except (TypeError, AttributeError):
+            # Execute selected action
             KEYS[c]()
         except KeyError:
+            # Action not found, do nothing
             pass
 
 

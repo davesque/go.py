@@ -20,4 +20,4 @@ class Position(object):
         return self.COLORS[self._color]
 
     def __repr__(self):
-        return '<Position: {0}>'.format(self._color)
+        return self._color.title()
