@@ -4,7 +4,7 @@ from canvas import Canvas
 
 
 class BoardView(Canvas):
-    HOSHI = '*'
+    HOSHI = '\033[1m+\033[0m'
     HOSHIS = [
         (4, 4), (10, 4), (16, 4),
         (4, 10), (10, 10), (16, 10),
@@ -36,6 +36,9 @@ class BoardView(Canvas):
         for x, y in self.HOSHIS:
             if self.get(x, y) == '+':
                 self.set(x, y, self.HOSHI)
+
+    def redraw(self):
+        self._reset()
 
     def _array_coords(cls, x, y):
         return x * 2 - 2, y - 1
@@ -69,6 +72,10 @@ class BoardView(Canvas):
             self._in_width(self._cursor[0] + 1),
             self._in_height(self._cursor[1]),
         )
+
+    @property
+    def cursor(self):
+        return self._cursor
 
     def __str__(self):
         canvas = deepcopy(self._canvas)
