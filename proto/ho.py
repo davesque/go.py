@@ -13,8 +13,12 @@ TURNS = (
 
 turn = Board.BLACK
 
+libs = None
+
 
 def main():
+    global libs
+
     board = Board(19, 19)
     view = BoardView(board)
 
@@ -31,6 +35,11 @@ def main():
     def exit():
         sys.exit(0)
 
+    def liberties():
+        global libs
+        x, y = view.cursor
+        libs = board.get_liberties(x, y)
+
     KEYS = {
         'w': view.cursor_up,
         'r': view.cursor_down,
@@ -38,13 +47,19 @@ def main():
         's': view.cursor_right,
         'x': move,
         '\x1b': exit,
+        'l': liberties,
     }
 
     while True:
         # Print board
         clear()
         print view
-        sys.stdout.write('{0}\'s move... '.format(repr(turn)))
+        sys.stdout.write('({0}) {1}\'s move... '.format(
+            libs,
+            repr(turn),
+        ))
+
+        libs = None
 
         # Get action
         c = getch()

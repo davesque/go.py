@@ -95,3 +95,68 @@ class Board(Canvas):
     BLACK = Position('black')
     WHITE = Position('white')
     EMPTY = Position('empty')
+
+    MOVE_POSITIONS = (
+        BLACK,
+        WHITE,
+    )
+
+    class BoardError(Canvas.CanvasError):
+        pass
+
+    def move(self, x, y, pos):
+        if pos not in self.MOVE_POSITIONS:
+            raise self.BoardError('Position \'{0}\' is not one of the following: {1}'.format(
+                repr(pos),
+                self.MOVE_POSITIONS
+            ))
+
+        if self.get(x, y) is not self.EMPTY:
+            raise self.BoardError('Cannot move on top of another piece')
+
+    def get_none(self, x, y):
+        """
+        Same thing as Canvas.get, but returns None if coordinates are not
+        within canvas dimensions.
+        """
+        try:
+            return self.get(x, y)
+        except Canvas.CanvasError:
+            return None
+
+    def get_surrounding(self, x, y):
+        """
+        Gets information about the surrounding positions for a specified
+        coordinate.  Returns a tuple of the positions clockwise starting from
+        the top.
+        """
+        coords = (  # Clockwise from top
+            (x, y - 1),
+            (x + 1, y),
+            (x, y + 1),
+            (x - 1, y),
+        )
+        return [
+            (self.get_none(a, b), (a, b))
+            for a, b in coords
+            if self.get_none(a, b)
+        ]
+
+    def _get_liberties(self, x, y, traversed):
+        pos = self.get(x, y)
+
+        if pos is self.EMPTY:
+            return 1
+        else:
+            positions = self.get_surrounding(x, y)
+
+            traversed.add((x, y))
+
+            return sum([
+                self._get_liberties(a, b, traversed)
+                for (p, (a, b)) in positions
+                if (p is pos or p is self.EMPTY) and (a, b) not in traversed
+            ])
+
+    def get_liberties(self, x, y):
+        return self._get_liberties(x, y, set())
