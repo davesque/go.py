@@ -130,7 +130,7 @@ class Board(Canvas):
         coordinate.  Returns a tuple of the positions clockwise starting from
         the top.
         """
-        coords = (  # Clockwise from top
+        coords = (
             (x, y - 1),
             (x + 1, y),
             (x, y + 1),
@@ -143,20 +143,43 @@ class Board(Canvas):
         ]
 
     def _get_liberties(self, x, y, traversed):
+        """
+        Recursively traverses adjascent positions of the same color to find all
+        surrounding liberties for the position at the given coordinates.
+        """
         pos = self.get(x, y)
 
         if pos is self.EMPTY:
-            return 1
+            # Return coords of empty position (this counts as a liberty)
+            return set([(x, y)])
         else:
-            positions = self.get_surrounding(x, y)
+            # Get surrounding positions which are empty or have the same color
+            # and whose coordinates have not already been traversed
+            positions = [
+                (p, (a, b))
+                for (p, (a, b)) in self.get_surrounding(x, y)
+                if (p is pos or p is self.EMPTY) and (a, b) not in traversed
+            ]
 
+            # Mark current coordinates as having been traversed
             traversed.add((x, y))
 
-            return sum([
+            # Collect unique coordinates of surrounding liberties
+            return set.union(*[
                 self._get_liberties(a, b, traversed)
-                for (p, (a, b)) in positions
-                if (p is pos or p is self.EMPTY) and (a, b) not in traversed
+                for (_, (a, b)) in positions
             ])
 
     def get_liberties(self, x, y):
+        """
+        Gets the coordinates for liberties surrounding the position at the
+        given coordinates.
+        """
         return self._get_liberties(x, y, set())
+
+    def count_liberties(self, x, y):
+        """
+        Gets the number of liberties surrounding the position at the
+        given coordinates.
+        """
+        return len(self.get_liberties(x, y))
