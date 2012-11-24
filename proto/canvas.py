@@ -1,3 +1,6 @@
+from copy import copy
+
+
 class Canvas(object):
     EMPTY = None
 
@@ -8,6 +11,10 @@ class Canvas(object):
         self._width = width
         self._height = height
         self._reset()
+
+    @property
+    def _copy(self):
+        return [copy(row) for row in self._canvas]
 
     def _reset(self, value=None):
         value = value or self.EMPTY

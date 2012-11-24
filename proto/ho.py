@@ -6,13 +6,6 @@ from board import Board, BoardView
 from utils import clear, getch
 
 
-TURNS = (
-    Board.BLACK,
-    Board.WHITE,
-)
-
-turn = Board.BLACK
-
 group = None
 
 
@@ -23,14 +16,8 @@ def main():
     view = BoardView(board)
 
     def move():
-        global turn
-
-        x, y = view.cursor
-        board.set(x, y, turn)
-
+        board.move(*view.cursor)
         view.redraw()
-
-        turn = TURNS[turn is Board.BLACK]
 
     def exit():
         sys.exit(0)
@@ -55,7 +42,7 @@ def main():
         clear()
         print view
         sys.stdout.write('{0}\n'.format(group))
-        sys.stdout.write('{0}\'s move... '.format(repr(turn)))
+        sys.stdout.write('{0}\'s move... '.format(repr(board.turn)))
 
         group = None
 

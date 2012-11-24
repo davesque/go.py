@@ -1,4 +1,3 @@
-from copy import deepcopy
 from position import Position
 from canvas import Canvas
 from utils import intersperse
@@ -79,7 +78,7 @@ class BoardView(Canvas):
         return self._cursor
 
     def __str__(self):
-        canvas = deepcopy(self._canvas)
+        canvas = self._copy
 
         if self._cursor:
             x, y = self._array_coords(
@@ -96,7 +95,7 @@ class Board(Canvas):
     WHITE = Position('white')
     EMPTY = Position('empty')
 
-    MOVE_POSITIONS = (
+    TURNS = (
         BLACK,
         WHITE,
     )
@@ -104,23 +103,44 @@ class Board(Canvas):
     class BoardError(Canvas.CanvasError):
         pass
 
-    def move(self, x, y, pos):
+    def __init__(self, *args, **kwargs):
+        super(Board, self).__init__(*args, **kwargs)
+
+        self._turn = self.BLACK
+
+        self._black_score = 0
+        self._white_score = 0
+
+        self._history = []
+
+    @property
+    def turn(self):
+        return self._turn
+
+    def move(self, x, y):
         # 1. Check if position is valid
-        if pos not in self.MOVE_POSITIONS:
-            raise self.BoardError('Position \'{0}\' is not one of the following: {1}'.format(
-                repr(pos),
-                self.MOVE_POSITIONS,
+        if self._turn not in self.TURNS:
+            raise self.BoardError('Position \'{0}\' must be one of the following: {1}'.format(
+                repr(self._turn),
+                self.TURNS,
             ))
 
         # 2. Check if coordinates are occupied
         if self.get(x, y) is not self.EMPTY:
             raise self.BoardError('Cannot move on top of another piece')
 
-        self.set(x, y, pos)
-
         # 3. Check if move is redundant.  A redundant move is one that would
         # return the board to the state at the time of a player's last move.
-        # (board w/ move == board~)
+        check_board = self._copy
+        a, b = self._array_coords(x, y)
+        check_board[b][a] = self._turn
+
+        try:
+            if check_board == self._history[-1][1]:
+                raise self.BoardError('Cannot make a move that is redundant')
+        except IndexError:
+            # No previous board state exists...let this one slide
+            pass
 
         # 4. Check if move is suicidal.  A suicidal move is a move into a
         # position which has no liberties.
@@ -129,12 +149,18 @@ class Board(Canvas):
         #   zero.
 
         # 5. Make move
+        # Add current board state to history and set move
+        self._history.append((self._turn, self._copy))
+        self.set(x, y, self._turn)
 
         # 6. Check if any pieces have been taken:
         #   * get surrounding positions, for each position:
         #     - count liberties for position
         #     - if liberties == zero, remove group for position and add group
         #     count to opponent's score
+
+        # Iterate turn
+        self._turn = self.TURNS[self._turn is self.BLACK]
 
     def get_none(self, x, y):
         """
