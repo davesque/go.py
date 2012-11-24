@@ -120,7 +120,7 @@ class Board(Canvas):
         self._turn = self.BLACK
 
         # Player scores
-        self._scores = {
+        self._score = {
             self.BLACK: 0,
             self.WHITE: 0,
         }
@@ -130,7 +130,20 @@ class Board(Canvas):
 
     @property
     def turn(self):
-        return self._turn
+        """
+        Gets the current turn.
+        """
+        return repr(self._turn)
+
+    @property
+    def score(self):
+        """
+        Gets the current score.
+        """
+        return {
+            'black': self._score[self.BLACK],
+            'white': self._score[self.WHITE],
+        }
 
     def move(self, x, y):
         """
@@ -205,15 +218,15 @@ class Board(Canvas):
         """
         Pushes game state onto history.
         """
-        self._history.append((self._copy, self._turn, copy(self._scores)))
+        self._history.append((self._copy, self._turn, copy(self._score)))
 
     def _pop_history(self):
         """
         Rewinds game history by one move.
         """
         try:
-            self._canvas, self._turn, self._scores = self._history.pop()
-            return (self._copy, self._turn, copy(self._scores))
+            self._canvas, self._turn, self._score = self._history.pop()
+            return (self._copy, self._turn, copy(self._score))
         except IndexError:
             return None
 
@@ -221,7 +234,7 @@ class Board(Canvas):
         """
         Adds points to the current turn's score.
         """
-        self._scores[self._turn] += score
+        self._score[self._turn] += score
 
     def _get_none(self, x, y):
         """

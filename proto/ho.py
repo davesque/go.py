@@ -29,8 +29,9 @@ def main():
     while True:
         # Print board
         clear()
-        print view
-        sys.stdout.write('{0}\'s move... '.format(repr(board.turn)))
+        sys.stdout.write('{0}\n'.format(view))
+        sys.stdout.write('Black: {black} -- White: {white}\n'.format(**board.score))
+        sys.stdout.write('{0}\'s move... '.format(board.turn))
 
         # Get action
         c = getch()
