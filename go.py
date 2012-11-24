@@ -15,6 +15,14 @@ def main():
         board.move(*view.cursor)
         view.redraw()
 
+    def undo():
+        board.undo()
+        view.redraw()
+
+    def redo():
+        board.redo()
+        view.redraw()
+
     def exit():
         sys.exit(0)
 
@@ -24,6 +32,8 @@ def main():
         'a': view.cursor_left,
         's': view.cursor_right,
         'x': move,
+        'u': undo,
+        'e': redo,
         '\x1b': exit,
     }
 
@@ -35,7 +45,7 @@ def main():
         sys.stdout.write('{0}\'s move... '.format(board.turn))
 
         if err:
-            sys.stdout.write(err + '\n')
+            sys.stdout.write('\n' + err + '\n')
             err = None
 
         # Get action

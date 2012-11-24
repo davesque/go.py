@@ -1,3 +1,4 @@
+from collections import namedtuple
 from copy import copy
 
 from position import Position
@@ -110,6 +111,8 @@ class Board(Canvas):
         WHITE,
     )
 
+    State = namedtuple('State', ['board', 'turn', 'score'])
+
     class BoardError(Canvas.CanvasError):
         pass
 
@@ -127,6 +130,7 @@ class Board(Canvas):
 
         # Game history
         self._history = []
+        self._redo = []
 
     @property
     def turn(self):
@@ -170,6 +174,7 @@ class Board(Canvas):
         self._check_for_redundancy()
 
         self._flip_turn()
+        self._redo = []
 
     def _check_for_suicide(self, x, y):
         """
@@ -214,21 +219,51 @@ class Board(Canvas):
         self._turn = self.TURNS[self._turn is self.BLACK]
         return self._turn
 
+    @property
+    def _state(self):
+        """
+        Returns the game state as a named tuple.
+        """
+        return self.State(self._copy, self._turn, copy(self._score))
+
     def _push_history(self):
         """
         Pushes game state onto history.
         """
-        self._history.append((self._copy, self._turn, copy(self._score)))
+        self._history.append(self._state)
 
     def _pop_history(self):
         """
         Rewinds game history by one move.
         """
+        current_state = self._state
         try:
             self._canvas, self._turn, self._score = self._history.pop()
-            return (self._copy, self._turn, copy(self._score))
+            return current_state
         except IndexError:
             return None
+
+    def undo(self):
+        """
+        Undoes one move.
+        """
+        state = self._pop_history()
+        if state:
+            self._redo.append(state)
+            return state
+        else:
+            raise self.BoardError('No moves to undo!')
+
+    def redo(self):
+        """
+        Re-plays one move that was undone.
+        """
+        try:
+            self._push_history()
+            self._canvas, self._turn, self._score = self._redo.pop()
+        except IndexError:
+            self._pop_history()
+            raise self.BoardError('No undone moves to redo!')
 
     def _tally(self, score):
         """
