@@ -122,61 +122,86 @@ class Board(Canvas):
         return self._turn
 
     def move(self, x, y):
-        # 1. Check if position is valid
-        if self._turn not in self.TURNS:
-            raise self.BoardError('Position \'{0}\' must be one of the following: {1}'.format(
-                repr(self._turn),
-                self.TURNS,
-            ))
-
-        # 2. Check if coordinates are occupied
+        # Check if coordinates are occupied
         if self.get(x, y) is not self.EMPTY:
             raise self.BoardError('Cannot move on top of another piece')
 
-        # 4. Check if move is suicidal.  A suicidal move is a move into a
-        # position which has no liberties.
-        #   - A move may have no liberties and still not be suicidal.  This
-        #   would happen if the move reduced the liberties of an enemy group to
-        #   zero.
-
-        # 5. Make move
-
-        # Add current board state to history and set move
-        self._history.append((self._copy, self._turn, copy(self._scores)))
+        # Store history and make move
+        self.push_history()
         self.set(x, y, self._turn)
 
-        # 6. Check if any pieces have been taken
-        surrounding = self.get_surrounding(x, y)
-        for (p, (x1, y1)) in surrounding:
-            if (
-                p is not self.EMPTY and
-                self.count_liberties(x1, y1) == 0
-            ):
-                score = self.kill_group(x1, y1)
-                self.tally(score)
+        # Check if any pieces have been taken
+        taken = self.take_pieces(x, y)
 
-        # 7. Iterate turn
-        self._turn = self.TURNS[self._turn is self.BLACK]
+        # Check if move is suicidal.  A suicidal move is a move that takes no
+        # pieces and is played on a coordinate which has no liberties.
+        if taken == 0:
+            self.check_for_suicide(x, y)
 
-        # 8. Check if move is redundant.  A redundant move is one that would
+        # Check if move is redundant.  A redundant move is one that would
         # return the board to the state at the time of a player's last move.
+        self.check_for_redundancy()
+
+        self.flip_turn()
+
+    def check_for_suicide(self, x, y):
+        """
+        Checks if move is suicidal.
+        """
+        if self.count_liberties(x, y) == 0:
+            self.pop_history()
+            raise self.BoardError('Cannot make suicidal move')
+
+    def check_for_redundancy(self):
+        """
+        Checks if board state is redundant.
+        """
         try:
             if self._canvas == self._history[-2][0]:
-                self.undo()
+                self.pop_history()
                 raise self.BoardError('Cannot make a move that is redundant')
         except IndexError:
             # Insufficient history...let this one slide
             pass
 
-    def undo(self):
+    def take_pieces(self, x, y):
         """
-        Undoes the previous move.
+        Checks if any pieces were taken by the last move at the specified
+        coordinates.  If so, removes them from play and tallies resulting
+        points.
+        """
+        scores = []
+        for (p, (x1, y1)) in self.get_surrounding(x, y):
+            if p is not self.EMPTY:
+                liberties = self.count_liberties(x1, y1)
+                if liberties == 0:
+                    score = self.kill_group(x1, y1)
+                    scores.append(score)
+                    self.tally(score)
+        return sum(scores)
+
+    def flip_turn(self):
+        """
+        Iterates the turn counter.
+        """
+        self._turn = self.TURNS[self._turn is self.BLACK]
+        return self._turn
+
+    def push_history(self):
+        """
+        Pushes game state onto history.
+        """
+        self._history.append((self._copy, self._turn, copy(self._scores)))
+
+    def pop_history(self):
+        """
+        Rewinds game history by one move.
         """
         try:
-            self._canvas, self._turn, self._scores = self._history[-1]
-            self._history = self._history[:-1]
+            self._canvas, self._turn, self._scores = self._history.pop()
+            return (self._copy, self._turn, copy(self._scores))
         except IndexError:
-            pass
+            return None
 
     def tally(self, score):
         """
