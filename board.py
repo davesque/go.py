@@ -225,6 +225,12 @@ class Board(Canvas):
         """
         return self.State(self._copy, self._turn, copy(self._score))
 
+    def _load_state(self, state):
+        """
+        Loads the specified game state.
+        """
+        self._canvas, self._turn, self._score = state
+
     def _push_history(self):
         """
         Pushes game state onto history.
@@ -237,7 +243,7 @@ class Board(Canvas):
         """
         current_state = self._state
         try:
-            self._canvas, self._turn, self._score = self._history.pop()
+            self._load_state(self._history.pop())
             return current_state
         except IndexError:
             return None
@@ -259,7 +265,7 @@ class Board(Canvas):
         """
         try:
             self._push_history()
-            self._canvas, self._turn, self._score = self._redo.pop()
+            self._load_state(self._redo.pop())
         except IndexError:
             self._pop_history()
             raise self.BoardError('No undone moves to redo!')
