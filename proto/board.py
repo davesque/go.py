@@ -1,3 +1,5 @@
+from copy import copy
+
 from position import Position
 from canvas import Canvas
 from utils import intersperse
@@ -108,8 +110,10 @@ class Board(Canvas):
 
         self._turn = self.BLACK
 
-        self._black_score = 0
-        self._white_score = 0
+        self._scores = {
+            self.BLACK: 0,
+            self.WHITE: 0,
+        }
 
         self._history = []
 
@@ -129,19 +133,6 @@ class Board(Canvas):
         if self.get(x, y) is not self.EMPTY:
             raise self.BoardError('Cannot move on top of another piece')
 
-        # 3. Check if move is redundant.  A redundant move is one that would
-        # return the board to the state at the time of a player's last move.
-        check_board = self._copy
-        a, b = self._array_coords(x, y)
-        check_board[b][a] = self._turn
-
-        try:
-            if check_board == self._history[-1][1]:
-                raise self.BoardError('Cannot make a move that is redundant')
-        except IndexError:
-            # No previous board state exists...let this one slide
-            pass
-
         # 4. Check if move is suicidal.  A suicidal move is a move into a
         # position which has no liberties.
         #   - A move may have no liberties and still not be suicidal.  This
@@ -149,18 +140,49 @@ class Board(Canvas):
         #   zero.
 
         # 5. Make move
+
         # Add current board state to history and set move
-        self._history.append((self._turn, self._copy))
+        self._history.append((self._copy, self._turn, copy(self._scores)))
         self.set(x, y, self._turn)
 
-        # 6. Check if any pieces have been taken:
-        #   * get surrounding positions, for each position:
-        #     - count liberties for position
-        #     - if liberties == zero, remove group for position and add group
-        #     count to opponent's score
+        # 6. Check if any pieces have been taken
+        surrounding = self.get_surrounding(x, y)
+        for (p, (x1, y1)) in surrounding:
+            if (
+                p is not self.EMPTY and
+                self.count_liberties(x1, y1) == 0
+            ):
+                score = self.kill_group(x1, y1)
+                self.tally(score)
 
-        # Iterate turn
+        # 7. Iterate turn
         self._turn = self.TURNS[self._turn is self.BLACK]
+
+        # 8. Check if move is redundant.  A redundant move is one that would
+        # return the board to the state at the time of a player's last move.
+        try:
+            if self._canvas == self._history[-2][0]:
+                self.undo()
+                raise self.BoardError('Cannot make a move that is redundant')
+        except IndexError:
+            # Insufficient history...let this one slide
+            pass
+
+    def undo(self):
+        """
+        Undoes the previous move.
+        """
+        try:
+            self._canvas, self._turn, self._scores = self._history[-1]
+            self._history = self._history[:-1]
+        except IndexError:
+            pass
+
+    def tally(self, score):
+        """
+        Adds points to the current turn's score.
+        """
+        self._scores[self._turn] += score
 
     def get_none(self, x, y):
         """
@@ -208,22 +230,39 @@ class Board(Canvas):
         found.add((x, y))
 
         # Find coordinates of similar neighbors
-        return found.union(*[
-            self._get_group(a, b, found)
-            for (_, (a, b)) in positions
-        ])
+        if positions:
+            return found.union(*[
+                self._get_group(a, b, found)
+                for (_, (a, b)) in positions
+            ])
+        else:
+            return found
 
     def get_group(self, x, y):
         """
         Gets the coordinates for all positions which are members of the same
         group as the position at the given coordinates.
         """
-        pos = self.get(x, y)
-
-        if pos not in (self.WHITE, self.BLACK):
-            raise self.BoardError('Can only get group of white or black position')
+        if self.get(x, y) not in self.TURNS:
+            raise self.BoardError('Can only get group for black or white position')
 
         return self._get_group(x, y, set())
+
+    def kill_group(self, x, y):
+        """
+        Kills a group of black or white pieces and returns its size for
+        scoring.
+        """
+        if self.get(x, y) not in self.TURNS:
+            raise self.BoardError('Can only kill black or white group')
+
+        group = self.get_group(x, y)
+        score = len(group)
+
+        for (x1, y1) in group:
+            self.set(x1, y1, self.EMPTY)
+
+        return score
 
     def _get_liberties(self, x, y, traversed):
         """
@@ -248,10 +287,13 @@ class Board(Canvas):
             traversed.add((x, y))
 
             # Collect unique coordinates of surrounding liberties
-            return set.union(*[
-                self._get_liberties(a, b, traversed)
-                for (_, (a, b)) in positions
-            ])
+            if positions:
+                return set.union(*[
+                    self._get_liberties(a, b, traversed)
+                    for (_, (a, b)) in positions
+                ])
+            else:
+                return set()
 
     def get_liberties(self, x, y):
         """

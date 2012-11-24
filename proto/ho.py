@@ -25,7 +25,7 @@ def main():
     def get_group():
         global group
         x, y = view.cursor
-        group = board.get_group(x, y)
+        group = board.get_surrounding(x, y)
 
     KEYS = {
         'w': view.cursor_up,
