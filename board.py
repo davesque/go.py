@@ -155,7 +155,7 @@ class Board(Canvas):
         """
         # Check if coordinates are occupied
         if self.get(x, y) is not self.EMPTY:
-            raise self.BoardError('Cannot move on top of another piece')
+            raise self.BoardError('Cannot move on top of another piece!')
 
         # Store history and make move
         self._push_history()
@@ -182,7 +182,7 @@ class Board(Canvas):
         """
         if self.count_liberties(x, y) == 0:
             self._pop_history()
-            raise self.BoardError('Cannot make suicidal move')
+            raise self.BoardError('Cannot play on position with no liberties!')
 
     def _check_for_redundancy(self):
         """
@@ -191,7 +191,7 @@ class Board(Canvas):
         try:
             if self._canvas == self._history[-2][0]:
                 self._pop_history()
-                raise self.BoardError('Cannot make a move that is redundant')
+                raise self.BoardError('Cannot make a move that is redundant!')
         except IndexError:
             # Insufficient history...let this one slide
             pass
