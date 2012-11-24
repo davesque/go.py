@@ -199,8 +199,7 @@ class Board(Canvas):
     def _take_pieces(self, x, y):
         """
         Checks if any pieces were taken by the last move at the specified
-        coordinates.  If so, removes them from play and tallies resulting
-        points.
+        coordinates.  If so, removes them from play and tally resulting points.
         """
         scores = []
         for (p, (x1, y1)) in self._get_surrounding(x, y):
@@ -234,7 +233,7 @@ class Board(Canvas):
 
     def _pop_history(self):
         """
-        Rewinds game history by one move.
+        Pops and loads game state from history.
         """
         current_state = self._state
         try:
@@ -256,7 +255,7 @@ class Board(Canvas):
 
     def redo(self):
         """
-        Re-plays one move that was undone.
+        Re-applies one move that was undone.
         """
         try:
             self._push_history()
