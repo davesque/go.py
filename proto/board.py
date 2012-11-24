@@ -6,7 +6,12 @@ from utils import intersperse
 
 
 class BoardView(Canvas):
+    """
+    Stores string canvas which is used to paint the board.  Also stores cursor
+    position.
+    """
     HOSHI = '+'
+
     HOSHIS = [
         (4, 4), (10, 4), (16, 4),
         (4, 10), (10, 10), (16, 10),
@@ -93,6 +98,9 @@ class BoardView(Canvas):
 
 
 class Board(Canvas):
+    """
+    Stores board positions.  Provides methods to carry out game logic.
+    """
     BLACK = Position('black')
     WHITE = Position('white')
     EMPTY = Position('empty')
@@ -108,13 +116,16 @@ class Board(Canvas):
     def __init__(self, *args, **kwargs):
         super(Board, self).__init__(*args, **kwargs)
 
+        # Turn counter
         self._turn = self.BLACK
 
+        # Player scores
         self._scores = {
             self.BLACK: 0,
             self.WHITE: 0,
         }
 
+        # Game history
         self._history = []
 
     @property
@@ -122,6 +133,9 @@ class Board(Canvas):
         return self._turn
 
     def move(self, x, y):
+        """
+        Makes a move at the given position for the current turn's color.
+        """
         # Check if coordinates are occupied
         if self.get(x, y) is not self.EMPTY:
             raise self.BoardError('Cannot move on top of another piece')
