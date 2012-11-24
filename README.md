@@ -1,4 +1,4 @@
-# Go.py
+# go.py
 
 A text-based go game written in python.
 
