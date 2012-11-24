@@ -9,6 +9,7 @@ from utils import clear, getch
 def main():
     board = Board(19, 19)
     view = BoardView(board)
+    err = None
 
     def move():
         board.move(*view.cursor)
@@ -30,8 +31,12 @@ def main():
         # Print board
         clear()
         sys.stdout.write('{0}\n'.format(view))
-        sys.stdout.write('Black: {black} -- White: {white}\n'.format(**board.score))
+        sys.stdout.write('Black: {black} <===> White: {white}\n'.format(**board.score))
         sys.stdout.write('{0}\'s move... '.format(board.turn))
+
+        if err:
+            sys.stdout.write(err + '\n')
+            err = None
 
         # Get action
         c = getch()
@@ -39,6 +44,9 @@ def main():
         try:
             # Execute selected action
             KEYS[c]()
+        except Board.BoardError as be:
+            # Board error (move on top of other piece, suicidal move, etc.)
+            err = be.message
         except KeyError:
             # Action not found, do nothing
             pass
