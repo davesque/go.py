@@ -141,73 +141,73 @@ class Board(Canvas):
             raise self.BoardError('Cannot move on top of another piece')
 
         # Store history and make move
-        self.push_history()
+        self._push_history()
         self.set(x, y, self._turn)
 
         # Check if any pieces have been taken
-        taken = self.take_pieces(x, y)
+        taken = self._take_pieces(x, y)
 
         # Check if move is suicidal.  A suicidal move is a move that takes no
         # pieces and is played on a coordinate which has no liberties.
         if taken == 0:
-            self.check_for_suicide(x, y)
+            self._check_for_suicide(x, y)
 
         # Check if move is redundant.  A redundant move is one that would
         # return the board to the state at the time of a player's last move.
-        self.check_for_redundancy()
+        self._check_for_redundancy()
 
-        self.flip_turn()
+        self._flip_turn()
 
-    def check_for_suicide(self, x, y):
+    def _check_for_suicide(self, x, y):
         """
         Checks if move is suicidal.
         """
         if self.count_liberties(x, y) == 0:
-            self.pop_history()
+            self._pop_history()
             raise self.BoardError('Cannot make suicidal move')
 
-    def check_for_redundancy(self):
+    def _check_for_redundancy(self):
         """
         Checks if board state is redundant.
         """
         try:
             if self._canvas == self._history[-2][0]:
-                self.pop_history()
+                self._pop_history()
                 raise self.BoardError('Cannot make a move that is redundant')
         except IndexError:
             # Insufficient history...let this one slide
             pass
 
-    def take_pieces(self, x, y):
+    def _take_pieces(self, x, y):
         """
         Checks if any pieces were taken by the last move at the specified
         coordinates.  If so, removes them from play and tallies resulting
         points.
         """
         scores = []
-        for (p, (x1, y1)) in self.get_surrounding(x, y):
+        for (p, (x1, y1)) in self._get_surrounding(x, y):
             if p is not self.EMPTY:
                 liberties = self.count_liberties(x1, y1)
                 if liberties == 0:
-                    score = self.kill_group(x1, y1)
+                    score = self._kill_group(x1, y1)
                     scores.append(score)
-                    self.tally(score)
+                    self._tally(score)
         return sum(scores)
 
-    def flip_turn(self):
+    def _flip_turn(self):
         """
         Iterates the turn counter.
         """
         self._turn = self.TURNS[self._turn is self.BLACK]
         return self._turn
 
-    def push_history(self):
+    def _push_history(self):
         """
         Pushes game state onto history.
         """
         self._history.append((self._copy, self._turn, copy(self._scores)))
 
-    def pop_history(self):
+    def _pop_history(self):
         """
         Rewinds game history by one move.
         """
@@ -217,13 +217,13 @@ class Board(Canvas):
         except IndexError:
             return None
 
-    def tally(self, score):
+    def _tally(self, score):
         """
         Adds points to the current turn's score.
         """
         self._scores[self._turn] += score
 
-    def get_none(self, x, y):
+    def _get_none(self, x, y):
         """
         Same thing as Canvas.get, but returns None if coordinates are not
         within canvas dimensions.
@@ -233,7 +233,7 @@ class Board(Canvas):
         except Canvas.CanvasError:
             return None
 
-    def get_surrounding(self, x, y):
+    def _get_surrounding(self, x, y):
         """
         Gets information about the surrounding positions for a specified
         coordinate.  Returns a tuple of the positions clockwise starting from
@@ -246,7 +246,7 @@ class Board(Canvas):
             (x - 1, y),
         )
         return filter(lambda i: bool(i[0]), [
-            (self.get_none(a, b), (a, b))
+            (self._get_none(a, b), (a, b))
             for a, b in coords
         ])
 
@@ -261,7 +261,7 @@ class Board(Canvas):
         # coordinates have not already been found
         positions = [
             (p, (a, b))
-            for (p, (a, b)) in self.get_surrounding(x, y)
+            for (p, (a, b)) in self._get_surrounding(x, y)
             if p is pos and (a, b) not in found
         ]
 
@@ -287,7 +287,7 @@ class Board(Canvas):
 
         return self._get_group(x, y, set())
 
-    def kill_group(self, x, y):
+    def _kill_group(self, x, y):
         """
         Kills a group of black or white pieces and returns its size for
         scoring.
@@ -318,7 +318,7 @@ class Board(Canvas):
             # and whose coordinates have not already been traversed
             positions = [
                 (p, (a, b))
-                for (p, (a, b)) in self.get_surrounding(x, y)
+                for (p, (a, b)) in self._get_surrounding(x, y)
                 if (p is pos or p is self.EMPTY) and (a, b) not in traversed
             ]
 
