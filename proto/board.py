@@ -105,14 +105,36 @@ class Board(Canvas):
         pass
 
     def move(self, x, y, pos):
+        # 1. Check if position is valid
         if pos not in self.MOVE_POSITIONS:
             raise self.BoardError('Position \'{0}\' is not one of the following: {1}'.format(
                 repr(pos),
-                self.MOVE_POSITIONS
+                self.MOVE_POSITIONS,
             ))
 
+        # 2. Check if coordinates are occupied
         if self.get(x, y) is not self.EMPTY:
             raise self.BoardError('Cannot move on top of another piece')
+
+        self.set(x, y, pos)
+
+        # 3. Check if move is redundant.  A redundant move is one that would
+        # return the board to the state at the time of a player's last move.
+        # (board w/ move == board~)
+
+        # 4. Check if move is suicidal.  A suicidal move is a move into a
+        # position which has no liberties.
+        #   - A move may have no liberties and still not be suicidal.  This
+        #   would happen if the move reduced the liberties of an enemy group to
+        #   zero.
+
+        # 5. Make move
+
+        # 6. Check if any pieces have been taken:
+        #   * get surrounding positions, for each position:
+        #     - count liberties for position
+        #     - if liberties == zero, remove group for position and add group
+        #     count to opponent's score
 
     def get_none(self, x, y):
         """
@@ -136,11 +158,46 @@ class Board(Canvas):
             (x, y + 1),
             (x - 1, y),
         )
-        return [
+        return filter(lambda i: bool(i[0]), [
             (self.get_none(a, b), (a, b))
             for a, b in coords
-            if self.get_none(a, b)
+        ])
+
+    def _get_group(self, x, y, found):
+        """
+        Recursively traverses adjascent positions of the same color to find all
+        positions which are members of the same group.
+        """
+        pos = self.get(x, y)
+
+        # Get surrounding positions which have the same color and whose
+        # coordinates have not already been found
+        positions = [
+            (p, (a, b))
+            for (p, (a, b)) in self.get_surrounding(x, y)
+            if p is pos and (a, b) not in found
         ]
+
+        # Add current coordinates to found coordinates
+        found.add((x, y))
+
+        # Find coordinates of similar neighbors
+        return found.union(*[
+            self._get_group(a, b, found)
+            for (_, (a, b)) in positions
+        ])
+
+    def get_group(self, x, y):
+        """
+        Gets the coordinates for all positions which are members of the same
+        group as the position at the given coordinates.
+        """
+        pos = self.get(x, y)
+
+        if pos not in (self.WHITE, self.BLACK):
+            raise self.BoardError('Can only get group of white or black position')
+
+        return self._get_group(x, y, set())
 
     def _get_liberties(self, x, y, traversed):
         """

@@ -19,6 +19,9 @@ class Position(object):
     def __eq__(self, other):
         return self._color == other._color
 
+    def __hash__(self):
+        return hash(self._color)
+
     def __str__(self):
         return self.COLORS[self._color]
 
