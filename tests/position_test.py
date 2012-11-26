@@ -1,6 +1,6 @@
 import unittest
 
-from position import Position, PositionError
+from go.position import Position, PositionError
 
 
 class PositionTest(unittest.TestCase):
