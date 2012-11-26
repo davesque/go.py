@@ -1,10 +1,11 @@
 from copy import copy
 
 
-class Array(object):
-    class ArrayError(Exception):
-        pass
+class ArrayError(Exception):
+    pass
 
+
+class Array(object):
     def __init__(self, width, height, empty=None):
         self._width = width
         self._height = height
@@ -20,10 +21,6 @@ class Array(object):
             for j in range(self._height)
         ]
 
-    @property
-    def _copy(self):
-        return [copy(row) for row in self._array]
-
     def _check_index(self, x, y):
         if (
             x < 1 or
@@ -31,11 +28,9 @@ class Array(object):
             y < 1 or
             y > self._height
         ):
-            raise self.ArrayError(
-                'Index ({x}, {y}) is not within array dimensions {w}x{h}'.format(
-                    x=x, y=y, w=self._width, h=self._height
-                )
-            )
+            raise ArrayError('Index is not within array dimensions {w}x{h}'.format(
+                x=x, y=y, w=self._width, h=self._height
+            ))
 
     def _zero_index(cls, x, y):
         return x - 1, y - 1
@@ -52,3 +47,7 @@ class Array(object):
 
     def __eq__(self, other):
         return self._array == other._array
+
+    @property
+    def _copy(self):
+        return [copy(row) for row in self._array]

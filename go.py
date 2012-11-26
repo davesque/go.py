@@ -2,8 +2,8 @@
 
 import sys
 
-from board import Board, BoardView
-from utils import clear, getch
+from go.board import Board, BoardView
+from go.utils import clear, getch
 
 
 def main():
