@@ -1,6 +1,6 @@
 import unittest
 
-from go.array import Array, ArrayError
+from go import Array, ArrayError
 
 
 class ArrayTest(unittest.TestCase):

@@ -1,8 +1,8 @@
 from collections import namedtuple
 from copy import copy
 
-from position import Position
-from canvas import Canvas
+from .position import Position
+from .canvas import Canvas
 
 
 class Board(Canvas):
