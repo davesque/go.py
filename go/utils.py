@@ -34,6 +34,7 @@ class _GetchUnix:
         import sys
         import tty
         import termios
+
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
         try:
@@ -50,6 +51,7 @@ class _GetchWindows:
 
     def __call__(self):
         import msvcrt
+
         return msvcrt.getch()
 
 
