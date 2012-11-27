@@ -1,5 +1,5 @@
 from .array import Array
-from board import Board
+from .board import Board
 
 
 class View(Array):
