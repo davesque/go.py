@@ -1,9 +1,8 @@
+from .array import Array
 from board import Board
-from canvas import Canvas
-from utils import intersperse
 
 
-class View(Canvas):
+class View(Array):
     """
     Stores string canvas which is used to paint the board.  Also stores cursor
     position.
@@ -23,30 +22,24 @@ class View(Canvas):
         self._cursor = (1, 1)
 
         super(View, self).__init__(
-            board._width * 2 - 1,
+            board._width,
             board._height,
         )
 
-        self._width = board._width
-        self._height = board._height
-
     def _reset(self):
-        board_canvas = self._board._canvas
-
-        self._canvas = [
-            intersperse(' ', [str(pos) for pos in row])
-            for row in board_canvas
+        # Draw pieces from board state
+        self._array = [
+            [str(pos) for pos in row]
+            for row in self._board._canvas
         ]
 
-        for x, y in self.HOSHIS:
-            if self.get(x, y) == str(Board.EMPTY):
-                self.set(x, y, self.HOSHI)
+        # Draw hoshi points
+        for i in self.HOSHIS:
+            if self[i] == str(Board.EMPTY):
+                self[i] = self.HOSHI
 
     def redraw(self):
         self._reset()
-
-    def _array_coords(cls, x, y):
-        return x * 2 - 2, y - 1
 
     def _in_width(self, v):
         return max(1, min(self._width, v))
@@ -83,13 +76,9 @@ class View(Canvas):
         return self._cursor
 
     def __str__(self):
-        canvas = self._copy
+        arr = self.copy
 
         if self._cursor:
-            x, y = self._array_coords(
-                self._cursor[0],
-                self._cursor[1],
-            )
-            canvas[y][x] = self.CURSOR
+            arr[self._cursor] = self.CURSOR
 
-        return '\n'.join([''.join(row) for row in canvas])
+        return '\n'.join([' '.join(row) for row in arr._array])

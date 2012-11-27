@@ -49,5 +49,7 @@ class Array(object):
         return self._array == other._array
 
     @property
-    def _copy(self):
-        return [copy(row) for row in self._array]
+    def copy(self):
+        new = copy(self)
+        new._array = [copy(row) for row in self._array]
+        return new
