@@ -3,7 +3,7 @@ from canvas import Canvas
 from utils import intersperse
 
 
-class BoardView(Canvas):
+class View(Canvas):
     """
     Stores string canvas which is used to paint the board.  Also stores cursor
     position.
@@ -22,7 +22,7 @@ class BoardView(Canvas):
         self._board = board
         self._cursor = (1, 1)
 
-        super(BoardView, self).__init__(
+        super(View, self).__init__(
             board._width * 2 - 1,
             board._height,
         )

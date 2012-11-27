@@ -2,12 +2,12 @@
 
 import sys
 
-from go import Board, BoardView, clear, getch
+from go import Board, View, clear, getch
 
 
 def main():
     board = Board(19, 19)
-    view = BoardView(board)
+    view = View(board)
     err = None
 
     def move():
