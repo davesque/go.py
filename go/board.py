@@ -64,12 +64,12 @@ class Board(Array):
         Makes a move at the given position for the current turn's color.
         """
         # Check if coordinates are occupied
-        if self[(x, y)] is not self.EMPTY:
+        if self[x, y] is not self.EMPTY:
             raise BoardError('Cannot move on top of another piece!')
 
         # Store history and make move
         self._push_history()
-        self[(x, y)] = self._turn
+        self[x, y] = self._turn
 
         # Check if any pieces have been taken
         taken = self._take_pieces(x, y)
@@ -192,7 +192,7 @@ class Board(Array):
         not within array dimensions.
         """
         try:
-            return self[(x, y)]
+            return self[x, y]
         except ArrayError:
             return None
 
@@ -218,7 +218,7 @@ class Board(Array):
         Recursively traverses adjascent positions of the same color to find all
         positions which are members of the same group.
         """
-        pos = self[(x, y)]
+        pos = self[x, y]
 
         # Get surrounding positions which have the same color and whose
         # coordinates have not already been found
@@ -245,7 +245,7 @@ class Board(Array):
         Gets the coordinates for all positions which are members of the same
         group as the position at the given coordinates.
         """
-        if self[(x, y)] not in self.TURNS:
+        if self[x, y] not in self.TURNS:
             raise BoardError('Can only get group for black or white position')
 
         return self._get_group(x, y, set())
@@ -255,14 +255,14 @@ class Board(Array):
         Kills a group of black or white pieces and returns its size for
         scoring.
         """
-        if self[(x, y)] not in self.TURNS:
+        if self[x, y] not in self.TURNS:
             raise BoardError('Can only kill black or white group')
 
         group = self.get_group(x, y)
         score = len(group)
 
         for (x1, y1) in group:
-            self[(x1, y1)] = self.EMPTY
+            self[x1, y1] = self.EMPTY
 
         return score
 
@@ -271,7 +271,7 @@ class Board(Array):
         Recursively traverses adjascent positions of the same color to find all
         surrounding liberties for the position at the given coordinates.
         """
-        pos = self[(x, y)]
+        pos = self[x, y]
 
         if pos is self.EMPTY:
             # Return coords of empty position (this counts as a liberty)
