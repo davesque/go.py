@@ -4,7 +4,7 @@ from .board import Board
 
 class View(Array):
     """
-    Stores string canvas which is used to paint the board.  Also stores cursor
+    Stores string array which is used to paint the board.  Also stores cursor
     position.
     """
     HOSHI = '+'
@@ -30,7 +30,7 @@ class View(Array):
         # Draw pieces from board state
         self._array = [
             [str(pos) for pos in row]
-            for row in self._board._canvas
+            for row in self._board._array
         ]
 
         # Draw hoshi points

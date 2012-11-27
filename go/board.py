@@ -1,11 +1,15 @@
 from collections import namedtuple
 from copy import copy
 
+from .array import Array, ArrayError
 from .position import Position
-from .canvas import Canvas
 
 
-class Board(Canvas):
+class BoardError(Exception):
+    pass
+
+
+class Board(Array):
     """
     Stores board positions.  Provides methods to carry out game logic.
     """
@@ -20,10 +24,9 @@ class Board(Canvas):
 
     State = namedtuple('State', ['board', 'turn', 'score'])
 
-    class BoardError(Canvas.CanvasError):
-        pass
-
     def __init__(self, *args, **kwargs):
+        kwargs['empty'] = self.EMPTY
+
         super(Board, self).__init__(*args, **kwargs)
 
         # Turn counter
@@ -61,12 +64,12 @@ class Board(Canvas):
         Makes a move at the given position for the current turn's color.
         """
         # Check if coordinates are occupied
-        if self.get(x, y) is not self.EMPTY:
-            raise self.BoardError('Cannot move on top of another piece!')
+        if self[(x, y)] is not self.EMPTY:
+            raise BoardError('Cannot move on top of another piece!')
 
         # Store history and make move
         self._push_history()
-        self.set(x, y, self._turn)
+        self[(x, y)] = self._turn
 
         # Check if any pieces have been taken
         taken = self._take_pieces(x, y)
@@ -89,16 +92,16 @@ class Board(Canvas):
         """
         if self.count_liberties(x, y) == 0:
             self._pop_history()
-            raise self.BoardError('Cannot play on position with no liberties!')
+            raise BoardError('Cannot play on position with no liberties!')
 
     def _check_for_redundancy(self):
         """
         Checks if board state is redundant.
         """
         try:
-            if self._canvas == self._history[-2][0]:
+            if self._array == self._history[-2][0]:
                 self._pop_history()
-                raise self.BoardError('Cannot make a move that is redundant!')
+                raise BoardError('Cannot make a move that is redundant!')
         except IndexError:
             # Insufficient history...let this one slide
             pass
@@ -130,13 +133,13 @@ class Board(Canvas):
         """
         Returns the game state as a named tuple.
         """
-        return self.State(self._copy, self._turn, copy(self._score))
+        return self.State(self.copy._array, self._turn, copy(self._score))
 
     def _load_state(self, state):
         """
         Loads the specified game state.
         """
-        self._canvas, self._turn, self._score = state
+        self._array, self._turn, self._score = state
 
     def _push_history(self):
         """
@@ -164,7 +167,7 @@ class Board(Canvas):
             self._redo.append(state)
             return state
         else:
-            raise self.BoardError('No moves to undo!')
+            raise BoardError('No moves to undo!')
 
     def redo(self):
         """
@@ -175,7 +178,7 @@ class Board(Canvas):
             self._load_state(self._redo.pop())
         except IndexError:
             self._pop_history()
-            raise self.BoardError('No undone moves to redo!')
+            raise BoardError('No undone moves to redo!')
 
     def _tally(self, score):
         """
@@ -185,12 +188,12 @@ class Board(Canvas):
 
     def _get_none(self, x, y):
         """
-        Same thing as Canvas.get, but returns None if coordinates are not
-        within canvas dimensions.
+        Same thing as Array.__getitem__, but returns None if coordinates are
+        not within array dimensions.
         """
         try:
-            return self.get(x, y)
-        except Canvas.CanvasError:
+            return self[(x, y)]
+        except ArrayError:
             return None
 
     def _get_surrounding(self, x, y):
@@ -215,7 +218,7 @@ class Board(Canvas):
         Recursively traverses adjascent positions of the same color to find all
         positions which are members of the same group.
         """
-        pos = self.get(x, y)
+        pos = self[(x, y)]
 
         # Get surrounding positions which have the same color and whose
         # coordinates have not already been found
@@ -242,8 +245,8 @@ class Board(Canvas):
         Gets the coordinates for all positions which are members of the same
         group as the position at the given coordinates.
         """
-        if self.get(x, y) not in self.TURNS:
-            raise self.BoardError('Can only get group for black or white position')
+        if self[(x, y)] not in self.TURNS:
+            raise BoardError('Can only get group for black or white position')
 
         return self._get_group(x, y, set())
 
@@ -252,14 +255,14 @@ class Board(Canvas):
         Kills a group of black or white pieces and returns its size for
         scoring.
         """
-        if self.get(x, y) not in self.TURNS:
-            raise self.BoardError('Can only kill black or white group')
+        if self[(x, y)] not in self.TURNS:
+            raise BoardError('Can only kill black or white group')
 
         group = self.get_group(x, y)
         score = len(group)
 
         for (x1, y1) in group:
-            self.set(x1, y1, self.EMPTY)
+            self[(x1, y1)] = self.EMPTY
 
         return score
 
@@ -268,7 +271,7 @@ class Board(Canvas):
         Recursively traverses adjascent positions of the same color to find all
         surrounding liberties for the position at the given coordinates.
         """
-        pos = self.get(x, y)
+        pos = self[(x, y)]
 
         if pos is self.EMPTY:
             # Return coords of empty position (this counts as a liberty)

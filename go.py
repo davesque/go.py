@@ -2,7 +2,7 @@
 
 import sys
 
-from go import Board, View, clear, getch
+from go import Board, BoardError, View, clear, getch
 
 
 def main():
@@ -53,7 +53,7 @@ def main():
         try:
             # Execute selected action
             KEYS[c]()
-        except Board.BoardError as be:
+        except BoardError as be:
             # Board error (move on top of other piece, suicidal move, etc.)
             err = be.message
         except KeyError:
