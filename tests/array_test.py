@@ -24,8 +24,8 @@ class ArrayTest(unittest.TestCase):
     def test_get_or_set_index(self):
         a = Array(4, 3, 0)
 
-        a[(1, 1)] = 1
-        a[(3, 1)] = 2
+        a[1, 1] = 1
+        a[3, 1] = 2
 
         self.assertEqual(
             a._array,
@@ -36,8 +36,8 @@ class ArrayTest(unittest.TestCase):
             ],
         )
 
-        self.assertEqual(a[(1, 1)], 1)
-        self.assertEqual(a[(2, 1)], 0)
+        self.assertEqual(a[1, 1], 1)
+        self.assertEqual(a[2, 1], 0)
 
     def test_get_or_set_invalid_index(self):
         a = Array(4, 3, 0)
@@ -50,8 +50,8 @@ class ArrayTest(unittest.TestCase):
         a2 = Array(4, 3, 0)
         a3 = Array(4, 3, 0)
 
-        a1[(1, 1)] = 1
-        a2[(1, 1)] = 1
+        a1[1, 1] = 1
+        a2[1, 1] = 1
 
         self.assertEqual(a1, a2)
         self.assertNotEqual(a1, a3)
