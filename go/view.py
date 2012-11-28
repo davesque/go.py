@@ -1,3 +1,5 @@
+import math
+
 from .array import Array
 from .board import Board
 
@@ -9,17 +11,13 @@ class View(Array):
     """
     HOSHI = '+'
 
-    HOSHIS = [
-        (4, 4), (10, 4), (16, 4),
-        (4, 10), (10, 10), (16, 10),
-        (4, 16), (10, 16), (16, 16),
-    ]
-
     CURSOR = 'X'
 
     def __init__(self, board):
         self._board = board
         self._cursor = (1, 1)
+
+        self._hoshis = self._get_hoshis(board._width)
 
         super(View, self).__init__(
             board._width,
@@ -34,12 +32,44 @@ class View(Array):
         ]
 
         # Draw hoshi points
-        for i in self.HOSHIS:
+        for i in self._hoshis:
             if self[i] == str(Board.EMPTY):
                 self[i] = self.HOSHI
 
     def redraw(self):
         self._reset()
+
+    def _get_hoshis(cls, width):
+        """
+        Calculates and returns hoshi points.
+        """
+        # The x-coordinate of a left hoshi point.  Roughly equivalent to the
+        # floor of the square root of the board width over 0.88.
+        left = top = int(math.floor(math.pow(width, 0.5) / 0.88))
+        right = bottom = width - left + 1
+        middle = width // 2 + 1
+
+        hoshis = tuple()
+
+        # Create corner hoshis
+        if width > 3:
+            hoshis += (
+                (left, top), (right, top),
+                (left, bottom), (right, bottom),
+            )
+
+        # Create center hoshi
+        if width > 7 and width % 2:
+            hoshis += ((middle, middle),)
+
+        # Create middle hoshis
+        if width > 13:
+            hoshis += (
+                (left, middle), (middle, top),
+                (right, middle), (middle, bottom),
+            )
+
+        return hoshis
 
     def _in_width(self, v):
         return max(1, min(self._width, v))

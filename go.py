@@ -1,12 +1,20 @@
 #!/usr/bin/env python
 
+import argparse
 import sys
 
 from go import Board, BoardError, View, clear, getch
 
 
 def main():
-    board = Board(19)
+    parser = argparse.ArgumentParser(
+        description='Starts a game of go in the terminal.'
+    )
+    parser.add_argument('-s', '--size', type=int, default=19, help='Size of board.')
+
+    args = parser.parse_args()
+
+    board = Board(args.size)
     view = View(board)
     err = None
 
