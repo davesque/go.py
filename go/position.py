@@ -14,8 +14,7 @@ class Position(object):
 
     def __init__(self, type):
         if type not in self.TYPES:
-            raise PositionError('Type must be one of the following: {1}'.format(
-                type,
+            raise PositionError('Type must be one of the following: {0}'.format(
                 self.TYPES.keys(),
             ))
         self._type = type
