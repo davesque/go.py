@@ -63,7 +63,7 @@ class View(Array):
             hoshis += ((middle, middle),)
 
         # Create middle hoshis
-        if width > 13:
+        if width > 13 and width % 2:
             hoshis += (
                 (left, middle), (middle, top),
                 (right, middle), (middle, bottom),
