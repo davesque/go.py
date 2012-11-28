@@ -7,9 +7,7 @@ from go import Board, BoardError, View, clear, getch
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Starts a game of go in the terminal.'
-    )
+    parser = argparse.ArgumentParser(description='Starts a game of go in the terminal.')
     parser.add_argument('-s', '--size', type=int, default=19, help='Size of board.')
 
     args = parser.parse_args()
