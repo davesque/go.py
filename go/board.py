@@ -213,7 +213,7 @@ class Board(Array):
             for a, b in coords
         ])
 
-    def _get_group(self, x, y, found):
+    def _get_group(self, x, y, traversed):
         """
         Recursively traverses adjascent positions of the same color to find all
         positions which are members of the same group.
@@ -221,24 +221,24 @@ class Board(Array):
         pos = self[x, y]
 
         # Get surrounding positions which have the same color and whose
-        # coordinates have not already been found
+        # coordinates have not already been traversed
         positions = [
             (p, (a, b))
             for (p, (a, b)) in self._get_surrounding(x, y)
-            if p is pos and (a, b) not in found
+            if p is pos and (a, b) not in traversed
         ]
 
-        # Add current coordinates to found coordinates
-        found.add((x, y))
+        # Add current coordinates to traversed coordinates
+        traversed.add((x, y))
 
         # Find coordinates of similar neighbors
         if positions:
-            return found.union(*[
-                self._get_group(a, b, found)
+            return traversed.union(*[
+                self._get_group(a, b, traversed)
                 for (_, (a, b)) in positions
             ])
         else:
-            return found
+            return traversed
 
     def get_group(self, x, y):
         """
