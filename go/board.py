@@ -13,6 +13,8 @@ class Board(Array):
     """
     Stores board positions.  Provides methods to carry out game logic.
     """
+    SIZES = tuple(range(3, 20, 2))  # [3, 5..19]
+
     BLACK = Position('black')
     WHITE = Position('white')
     EMPTY = Position('empty')
@@ -24,10 +26,11 @@ class Board(Array):
 
     State = namedtuple('State', ['board', 'turn', 'score'])
 
-    def __init__(self, *args, **kwargs):
-        kwargs['empty'] = self.EMPTY
+    def __init__(self, width):
+        if width not in self.SIZES:
+            raise BoardError('Board size must be one of the following: {0}'.format(self.SIZES))
 
-        super(Board, self).__init__(*args, **kwargs)
+        super(Board, self).__init__(width, width, self.EMPTY)
 
         # Turn counter
         self._turn = self.BLACK

@@ -6,7 +6,7 @@ from go import Board, BoardError, View, clear, getch
 
 
 def main():
-    board = Board(19, 19)
+    board = Board(19)
     view = View(board)
     err = None
 
