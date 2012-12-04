@@ -118,13 +118,12 @@ class Board(Array):
         points.
         """
         scores = []
-        for (p, (x1, y1)) in self._get_surrounding(x, y):
-            if p is not self.EMPTY:
-                liberties = self.count_liberties(x1, y1)
-                if liberties == 0:
-                    score = self._kill_group(x1, y1)
-                    scores.append(score)
-                    self._tally(score)
+        for p, (x1, y1) in self._get_surrounding(x, y):
+            # If position is opponent's color and has no liberties, tally it up
+            if p is self._next_turn and self.count_liberties(x1, y1) == 0:
+                score = self._kill_group(x1, y1)
+                scores.append(score)
+                self._tally(score)
         return sum(scores)
 
     def _flip_turn(self):
