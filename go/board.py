@@ -57,6 +57,13 @@ class Board(Array):
             'white': self._score[self.WHITE],
         }
 
+    @property
+    def _next_turn(self):
+        """
+        Gets color of next turn.
+        """
+        return self.TURNS[self._turn is self.BLACK]
+
     def move(self, x, y):
         """
         Makes a move at the given position for the current turn's color.
@@ -107,7 +114,8 @@ class Board(Array):
     def _take_pieces(self, x, y):
         """
         Checks if any pieces were taken by the last move at the specified
-        coordinates.  If so, removes them from play and tally resulting points.
+        coordinates.  If so, removes them from play and tallies resulting
+        points.
         """
         scores = []
         for (p, (x1, y1)) in self._get_surrounding(x, y):
@@ -123,7 +131,7 @@ class Board(Array):
         """
         Iterates the turn counter.
         """
-        self._turn = self.TURNS[self._turn is self.BLACK]
+        self._turn = self._next_turn
         return self._turn
 
     @property
