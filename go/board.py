@@ -229,7 +229,7 @@ class Board(Array):
         # coordinates have not already been traversed
         positions = [
             (p, (a, b))
-            for (p, (a, b)) in self._get_surrounding(x, y)
+            for p, (a, b) in self._get_surrounding(x, y)
             if p is pos and (a, b) not in traversed
         ]
 
@@ -240,7 +240,7 @@ class Board(Array):
         if positions:
             return traversed.union(*[
                 self._get_group(a, b, traversed)
-                for (_, (a, b)) in positions
+                for _, (a, b) in positions
             ])
         else:
             return traversed
@@ -266,7 +266,7 @@ class Board(Array):
         group = self.get_group(x, y)
         score = len(group)
 
-        for (x1, y1) in group:
+        for x1, y1 in group:
             self[x1, y1] = self.EMPTY
 
         return score
@@ -286,7 +286,7 @@ class Board(Array):
             # and whose coordinates have not already been traversed
             positions = [
                 (p, (a, b))
-                for (p, (a, b)) in self._get_surrounding(x, y)
+                for p, (a, b) in self._get_surrounding(x, y)
                 if (p is pos or p is self.EMPTY) and (a, b) not in traversed
             ]
 
@@ -297,7 +297,7 @@ class Board(Array):
             if positions:
                 return set.union(*[
                     self._get_liberties(a, b, traversed)
-                    for (_, (a, b)) in positions
+                    for _, (a, b) in positions
                 ])
             else:
                 return set()
