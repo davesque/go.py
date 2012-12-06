@@ -17,7 +17,7 @@ class BoardTest(unittest.TestCase):
         b = Board.BLACK
         w = Board.WHITE
 
-        self.assertListEqual(self.bo._array, [
+        self.assertEqual(self.bo._array, [
             [e, e, e, e, e],
             [e, e, e, e, e],
             [e, e, e, e, e],
@@ -25,10 +25,10 @@ class BoardTest(unittest.TestCase):
             [e, e, e, e, e],
         ])
 
-        self.assertIs(self.bo._turn, b)
-        self.assertDictEqual(self.bo._score, {b: 0, w: 0})
-        self.assertListEqual(self.bo._history, [])
-        self.assertListEqual(self.bo._redo, [])
+        self.assertTrue(self.bo._turn is b)
+        self.assertEqual(self.bo._score, {b: 0, w: 0})
+        self.assertEqual(self.bo._history, [])
+        self.assertEqual(self.bo._redo, [])
 
     def test_turn(self):
         self.assertEqual(self.bo.turn, 'Black')
@@ -44,7 +44,7 @@ class BoardTest(unittest.TestCase):
         b = Board.BLACK
         w = Board.WHITE
 
-        self.assertDictEqual(self.bo.score, {
+        self.assertEqual(self.bo.score, {
             'black': 0,
             'white': 0,
         })
@@ -58,7 +58,7 @@ class BoardTest(unittest.TestCase):
         ]
         self.bo.move(1, 2)
 
-        self.assertDictEqual(self.bo.score, {
+        self.assertEqual(self.bo.score, {
             'black': 1,
             'white': 0,
         })
@@ -73,7 +73,7 @@ class BoardTest(unittest.TestCase):
         ]
         self.bo.move(1, 3)
 
-        self.assertDictEqual(self.bo.score, {
+        self.assertEqual(self.bo.score, {
             'black': 4,
             'white': 0,
         })
@@ -82,13 +82,13 @@ class BoardTest(unittest.TestCase):
         b = Board.BLACK
         w = Board.WHITE
 
-        self.assertIs(self.bo._next_turn, w)
+        self.assertTrue(self.bo._next_turn is w)
         self.bo.move(1, 1)
-        self.assertIs(self.bo._next_turn, b)
+        self.assertTrue(self.bo._next_turn is b)
         self.bo.move(2, 2)
-        self.assertIs(self.bo._next_turn, w)
+        self.assertTrue(self.bo._next_turn is w)
         self.bo.move(3, 3)
-        self.assertIs(self.bo._next_turn, b)
+        self.assertTrue(self.bo._next_turn is b)
 
     def test_flip_turn(self):
         b = Board.BLACK
