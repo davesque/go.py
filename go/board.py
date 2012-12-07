@@ -2,7 +2,7 @@ from collections import namedtuple
 from copy import copy
 
 from .array import Array, ArrayError
-from .position import Position
+from .location import Location
 
 
 class BoardError(Exception):
@@ -11,11 +11,11 @@ class BoardError(Exception):
 
 class Board(Array):
     """
-    Stores board positions.  Provides methods to carry out game logic.
+    Stores board locations.  Provides methods to carry out game logic.
     """
-    BLACK = Position('black')
-    WHITE = Position('white')
-    EMPTY = Position('empty')
+    BLACK = Location('black')
+    WHITE = Location('white')
+    EMPTY = Location('empty')
 
     TURNS = (
         BLACK,
@@ -66,7 +66,7 @@ class Board(Array):
 
     def move(self, x, y):
         """
-        Makes a move at the given position for the current turn's color.
+        Makes a move at the given location for the current turn's color.
         """
         # Check if coordinates are occupied
         if self[x, y] is not self.EMPTY:
@@ -97,7 +97,7 @@ class Board(Array):
         """
         if self.count_liberties(x, y) == 0:
             self._pop_history()
-            raise BoardError('Cannot play on position with no liberties!')
+            raise BoardError('Cannot play on location with no liberties!')
 
     def _check_for_redundancy(self):
         """
@@ -119,7 +119,7 @@ class Board(Array):
         """
         scores = []
         for p, (x1, y1) in self._get_surrounding(x, y):
-            # If position is opponent's color and has no liberties, tally it up
+            # If location is opponent's color and has no liberties, tally it up
             if p is self._next_turn and self.count_liberties(x1, y1) == 0:
                 score = self._kill_group(x1, y1)
                 scores.append(score)
@@ -203,8 +203,8 @@ class Board(Array):
 
     def _get_surrounding(self, x, y):
         """
-        Gets information about the surrounding positions for a specified
-        coordinate.  Returns a tuple of the positions clockwise starting from
+        Gets information about the surrounding locations for a specified
+        coordinate.  Returns a tuple of the locations clockwise starting from
         the top.
         """
         coords = (
@@ -220,14 +220,14 @@ class Board(Array):
 
     def _get_group(self, x, y, traversed):
         """
-        Recursively traverses adjascent positions of the same color to find all
-        positions which are members of the same group.
+        Recursively traverses adjascent locations of the same color to find all
+        locations which are members of the same group.
         """
         pos = self[x, y]
 
-        # Get surrounding positions which have the same color and whose
+        # Get surrounding locations which have the same color and whose
         # coordinates have not already been traversed
-        positions = [
+        locations = [
             (p, (a, b))
             for p, (a, b) in self._get_surrounding(x, y)
             if p is pos and (a, b) not in traversed
@@ -237,21 +237,21 @@ class Board(Array):
         traversed.add((x, y))
 
         # Find coordinates of similar neighbors
-        if positions:
+        if locations:
             return traversed.union(*[
                 self._get_group(a, b, traversed)
-                for _, (a, b) in positions
+                for _, (a, b) in locations
             ])
         else:
             return traversed
 
     def get_group(self, x, y):
         """
-        Gets the coordinates for all positions which are members of the same
-        group as the position at the given coordinates.
+        Gets the coordinates for all locations which are members of the same
+        group as the location at the given coordinates.
         """
         if self[x, y] not in self.TURNS:
-            raise BoardError('Can only get group for black or white position')
+            raise BoardError('Can only get group for black or white location')
 
         return self._get_group(x, y, set())
 
@@ -273,18 +273,18 @@ class Board(Array):
 
     def _get_liberties(self, x, y, traversed):
         """
-        Recursively traverses adjascent positions of the same color to find all
-        surrounding liberties for the position at the given coordinates.
+        Recursively traverses adjascent locations of the same color to find all
+        surrounding liberties for the group at the given coordinates.
         """
         pos = self[x, y]
 
         if pos is self.EMPTY:
-            # Return coords of empty position (this counts as a liberty)
+            # Return coords of empty location (this counts as a liberty)
             return set([(x, y)])
         else:
-            # Get surrounding positions which are empty or have the same color
+            # Get surrounding locations which are empty or have the same color
             # and whose coordinates have not already been traversed
-            positions = [
+            locations = [
                 (p, (a, b))
                 for p, (a, b) in self._get_surrounding(x, y)
                 if (p is pos or p is self.EMPTY) and (a, b) not in traversed
@@ -294,24 +294,24 @@ class Board(Array):
             traversed.add((x, y))
 
             # Collect unique coordinates of surrounding liberties
-            if positions:
+            if locations:
                 return set.union(*[
                     self._get_liberties(a, b, traversed)
-                    for _, (a, b) in positions
+                    for _, (a, b) in locations
                 ])
             else:
                 return set()
 
     def get_liberties(self, x, y):
         """
-        Gets the coordinates for liberties surrounding the position at the
-        given coordinates.
+        Gets the coordinates for liberties surrounding the group at the given
+        coordinates.
         """
         return self._get_liberties(x, y, set())
 
     def count_liberties(self, x, y):
         """
-        Gets the number of liberties surrounding the position at the
-        given coordinates.
+        Gets the number of liberties surrounding the group at the given
+        coordinates.
         """
         return len(self.get_liberties(x, y))

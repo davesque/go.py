@@ -1,11 +1,11 @@
 from utils import bold
 
 
-class PositionError(Exception):
+class LocationError(Exception):
     pass
 
 
-class Position(object):
+class Location(object):
     TYPES = {
         'black': bold('@'),
         'white': bold('O'),
@@ -14,7 +14,7 @@ class Position(object):
 
     def __init__(self, type):
         if type not in self.TYPES:
-            raise PositionError('Type must be one of the following: {0}'.format(
+            raise LocationError('Type must be one of the following: {0}'.format(
                 self.TYPES.keys(),
             ))
         self._type = type
