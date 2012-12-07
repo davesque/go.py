@@ -240,3 +240,36 @@ class BoardTest(unittest.TestCase):
         self.assertNotEqual(self.bo._state, state1)
         self.assertEqual(self.bo._history, [state1])
         self.assertEqual(self.bo._redo, [])
+
+    def test_tally(self):
+        self.assertEqual(self.bo.score, {
+            'black': 0,
+            'white': 0,
+        })
+
+        self.bo._tally(100)
+
+        self.assertEqual(self.bo.score, {
+            'black': 100,
+            'white': 0,
+        })
+
+        self.bo.move(3, 3)
+        self.bo._tally(100)
+
+        self.assertEqual(self.bo.score, {
+            'black': 100,
+            'white': 100,
+        })
+
+    def test_get_none(self):
+        e = Board.EMPTY
+        b = Board.BLACK
+        w = Board.WHITE
+
+        self.assertTrue(self.bo._get_none(1, 1) is e)
+        self.bo.move(3, 3)
+        self.assertTrue(self.bo._get_none(3, 3) is b)
+        self.bo.move(3, 2)
+        self.assertTrue(self.bo._get_none(3, 2) is w)
+        self.assertTrue(self.bo._get_none(-1, 100) is None)
