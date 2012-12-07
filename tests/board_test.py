@@ -1,6 +1,6 @@
 import unittest
 
-from go import Board
+from go import Board, BoardError
 
 
 class BoardTest(unittest.TestCase):
@@ -177,3 +177,37 @@ class BoardTest(unittest.TestCase):
 
         self.assertTrue(len(self.bo._history) == 1)
         self.assertEqual(self.bo._history[0], state)
+
+    def test_pop_history(self):
+        self.assertEqual(self.bo._history, [])
+
+        state = self.bo._state
+        self.bo.move(3, 3)
+
+        self.assertNotEqual(self.bo._state, state)
+
+        self.bo._pop_history()
+
+        self.assertEqual(self.bo._state, state)
+
+    def test_undo(self):
+        self.assertRaises(BoardError, self.bo.undo)
+        self.assertEqual(self.bo._redo, [])
+        self.assertEqual(self.bo._history, [])
+
+        state1 = self.bo._state
+        self.bo.move(3, 3)
+
+        self.assertNotEqual(self.bo._state, state1)
+        self.assertEqual(self.bo._history, [state1])
+        self.assertEqual(self.bo._redo, [])
+
+        state2 = self.bo._state
+        pop_state = self.bo.undo()
+
+        self.assertEqual(self.bo._state, state1)
+        self.assertEqual(pop_state, state2)
+        self.assertNotEqual(self.bo._state, pop_state)
+
+        self.assertEqual(self.bo._history, [])
+        self.assertEqual(self.bo._redo, [pop_state])
