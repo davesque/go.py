@@ -211,3 +211,32 @@ class BoardTest(unittest.TestCase):
 
         self.assertEqual(self.bo._history, [])
         self.assertEqual(self.bo._redo, [pop_state])
+
+    def test_redo(self):
+        self.assertRaises(BoardError, self.bo.undo)
+        self.assertEqual(self.bo._redo, [])
+        self.assertEqual(self.bo._history, [])
+
+        state1 = self.bo._state
+        self.bo.move(3, 3)
+
+        self.assertNotEqual(self.bo._state, state1)
+        self.assertEqual(self.bo._history, [state1])
+        self.assertEqual(self.bo._redo, [])
+
+        state2 = self.bo._state
+        pop_state = self.bo.undo()
+
+        self.assertEqual(self.bo._state, state1)
+        self.assertEqual(pop_state, state2)
+        self.assertNotEqual(self.bo._state, pop_state)
+
+        self.assertEqual(self.bo._history, [])
+        self.assertEqual(self.bo._redo, [pop_state])
+
+        self.bo.redo()
+
+        self.assertEqual(self.bo._state, state2)
+        self.assertNotEqual(self.bo._state, state1)
+        self.assertEqual(self.bo._history, [state1])
+        self.assertEqual(self.bo._redo, [])
