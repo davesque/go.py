@@ -223,14 +223,14 @@ class Board(Array):
         Recursively traverses adjascent locations of the same color to find all
         locations which are members of the same group.
         """
-        pos = self[x, y]
+        loc = self[x, y]
 
         # Get surrounding locations which have the same color and whose
         # coordinates have not already been traversed
         locations = [
             (p, (a, b))
             for p, (a, b) in self._get_surrounding(x, y)
-            if p is pos and (a, b) not in traversed
+            if p is loc and (a, b) not in traversed
         ]
 
         # Add current coordinates to traversed coordinates
@@ -276,9 +276,9 @@ class Board(Array):
         Recursively traverses adjascent locations of the same color to find all
         surrounding liberties for the group at the given coordinates.
         """
-        pos = self[x, y]
+        loc = self[x, y]
 
-        if pos is self.EMPTY:
+        if loc is self.EMPTY:
             # Return coords of empty location (this counts as a liberty)
             return set([(x, y)])
         else:
@@ -287,7 +287,7 @@ class Board(Array):
             locations = [
                 (p, (a, b))
                 for p, (a, b) in self._get_surrounding(x, y)
-                if (p is pos or p is self.EMPTY) and (a, b) not in traversed
+                if (p is loc or p is self.EMPTY) and (a, b) not in traversed
             ]
 
             # Mark current coordinates as having been traversed

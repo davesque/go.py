@@ -27,7 +27,7 @@ class View(Array):
     def _reset(self):
         # Draw pieces from board state
         self._array = [
-            [str(pos) for pos in row]
+            [str(loc) for loc in row]
             for row in self._board._array
         ]
 
