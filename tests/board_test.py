@@ -156,3 +156,24 @@ class BoardTest(unittest.TestCase):
         self.assertTrue(_state[0] is not state[0])
         self.assertTrue(_state[1] is state[1])
         self.assertTrue(_state[2] is not state[2])
+
+    def test_load_state(self):
+        state = self.bo._state
+
+        self.bo.move(3, 3)
+
+        self.assertNotEqual(self.bo._state, state)
+
+        self.bo._load_state(state)
+
+        self.assertEqual(self.bo._state, state)
+
+    def test_push_history(self):
+        self.assertEqual(self.bo._history, [])
+
+        state = self.bo._state
+
+        self.bo._push_history()
+
+        self.assertTrue(len(self.bo._history) == 1)
+        self.assertEqual(self.bo._history[0], state)
