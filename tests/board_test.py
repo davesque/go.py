@@ -273,3 +273,34 @@ class BoardTest(unittest.TestCase):
         self.bo.move(3, 2)
         self.assertTrue(self.bo._get_none(3, 2) is w)
         self.assertTrue(self.bo._get_none(-1, 100) is None)
+
+    def test_get_surrounding(self):
+        e = Board.EMPTY
+        b = Board.BLACK
+        w = Board.WHITE
+
+        self.assertEqual(self.bo._get_surrounding(3, 3), [
+            (e, (3, 2)),
+            (e, (4, 3)),
+            (e, (3, 4)),
+            (e, (2, 3)),
+        ])
+
+        self.bo.move(1, 1)
+
+        self.assertEqual(self.bo._get_surrounding(2, 1), [
+            (e, (3, 1)),
+            (e, (2, 2)),
+            (b, (1, 1)),
+        ])
+
+        self.bo.move(2, 1)
+
+        self.assertEqual(self.bo._get_surrounding(1, 1), [
+            (w, (2, 1)),
+            (e, (1, 2)),
+        ])
+        self.assertEqual(self.bo._get_surrounding(5, 5), [
+            (e, (5, 4)),
+            (e, (4, 5)),
+        ])
