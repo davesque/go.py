@@ -7,30 +7,47 @@ from go import Board, BoardError, View, clear, getch
 
 
 def main():
+    # Get arguments
     parser = argparse.ArgumentParser(description='Starts a game of go in the terminal.')
     parser.add_argument('-s', '--size', type=int, default=19, help='Size of board.')
 
     args = parser.parse_args()
 
+    # Initialize board and view
     board = Board(args.size)
     view = View(board)
     err = None
 
+    # User actions
     def move():
+        """
+        Makes a move at the current position of the cursor for the current
+        turn.
+        """
         board.move(*view.cursor)
         view.redraw()
 
     def undo():
+        """
+        Undoes the last move.
+        """
         board.undo()
         view.redraw()
 
     def redo():
+        """
+        Redoes an undone move.
+        """
         board.redo()
         view.redraw()
 
     def exit():
+        """
+        Exits the game.
+        """
         sys.exit(0)
 
+    # Action keymap
     KEYS = {
         'w': view.cursor_up,
         'r': view.cursor_down,
@@ -42,6 +59,7 @@ def main():
         '\x1b': exit,
     }
 
+    # Main loop
     while True:
         # Print board
         clear()
@@ -53,7 +71,7 @@ def main():
             sys.stdout.write('\n' + err + '\n')
             err = None
 
-        # Get action
+        # Get action key
         c = getch()
 
         try:
