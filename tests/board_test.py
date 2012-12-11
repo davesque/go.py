@@ -560,7 +560,7 @@ class BoardTest(unittest.TestCase):
         self.assertEqual(bo.count_liberties(14, 13), 13)
 
     def test_move(self):
-        bo, _, B, W = self.get_test_board_2()
+        bo = self.get_test_board_2()[0]
 
         # Assert cannot move ontop of another piece
         self.assertRaises(BoardError, bo.move, 1, 1)
