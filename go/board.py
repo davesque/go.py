@@ -86,7 +86,7 @@ class Board(Array):
 
         # Check if move is redundant.  A redundant move is one that would
         # return the board to the state at the time of a player's last move.
-        self._check_for_redundancy()
+        self._check_for_ko()
 
         self._flip_turn()
         self._redo = []
@@ -99,7 +99,7 @@ class Board(Array):
             self._pop_history()
             raise BoardError('Cannot play on location with no liberties!')
 
-    def _check_for_redundancy(self):
+    def _check_for_ko(self):
         """
         Checks if board state is redundant.
         """
