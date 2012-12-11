@@ -13,6 +13,10 @@ def main():
 
     args = parser.parse_args()
 
+    if args.size < 7 or args.size > 19:
+        sys.stdout.write('Board size must be between 7 and 19!\n')
+        sys.exit(0)
+
     # Initialize board and view
     board = Board(args.size)
     view = View(board)
