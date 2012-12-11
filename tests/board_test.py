@@ -504,6 +504,9 @@ class BoardTest(unittest.TestCase):
         # self.assertRaises(BoardError, bo.get_group, 3, 1)
         # self.assertRaises(BoardError, bo.get_group, 10, 10)
 
+        # Assert empty location returns self as liberty
+        self.assertEqual(bo.get_liberties(3, 1), set([(3, 1)]))
+
         # Assert correct upper-left groups
         self.assertEqual(bo.get_liberties(1, 1), set([
             (1, 2), (2, 2), (3, 1),
@@ -549,3 +552,49 @@ class BoardTest(unittest.TestCase):
             (17, 13), (17, 14), (17, 15), (17, 17),
             (18, 16), (18, 18), (18, 19)
         ]))
+
+    def test_count_liberties(self):
+        _ = Board.EMPTY
+        B = Board.BLACK
+        W = Board.WHITE
+
+        bo = Board(19)
+
+        bo._array = [
+            [B, B, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [_, _, _, _, W, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [_, W, _, W, B, W, _, B, _, _, _, _, _, _, _, _, _, _, _],
+            [_, W, _, _, W, _, _, B, B, _, _, _, _, _, _, _, _, _, _],
+            [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [_, W, W, W, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [_, B, B, W, _, W, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [_, B, B, W, W, W, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [_, _, W, W, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [_, _, _, _, _, _, _, _, _, _, B, B, B, W, W, W, _, _, _],
+            [_, _, _, _, _, _, _, _, _, _, B, _, B, W, _, W, _, _, _],
+            [_, _, _, _, _, _, _, _, _, _, B, B, B, W, _, W, _, _, _],
+            [_, _, _, _, _, _, _, _, _, _, B, B, W, W, _, W, W, _, _],
+            [_, _, _, _, _, _, _, _, _, _, B, B, B, B, B, W, _, W, _],
+            [_, _, _, _, _, _, _, _, _, _, B, _, B, B, B, W, W, _, _],
+            [_, _, _, _, _, _, _, _, _, _, B, _, B, B, W, W, W, _, _],
+        ]
+
+        # Assert empty location returns self as liberty (count 1)
+        self.assertEqual(bo.count_liberties(3, 1), 1)
+
+        # Assert correct upper-left groups
+        self.assertEqual(bo.count_liberties(1, 1), 3)
+        self.assertEqual(bo.count_liberties(2, 1), 3)
+        self.assertEqual(bo.count_liberties(2, 3), 6)
+        self.assertEqual(bo.count_liberties(5, 2), 3)
+        self.assertEqual(bo.count_liberties(5, 3), 0)
+        self.assertEqual(bo.count_liberties(8, 3), 7)
+        self.assertEqual(bo.count_liberties(2, 7), 3)
+        self.assertEqual(bo.count_liberties(2, 6), 14)
+
+        # # Assert correct lower-right groups
+        self.assertEqual(bo.count_liberties(11, 13), 14)
+        self.assertEqual(bo.count_liberties(14, 13), 13)
