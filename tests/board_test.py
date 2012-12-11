@@ -55,23 +55,23 @@ class BoardTest(unittest.TestCase):
         bo._array = [
             [B, B, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
             [_, _, _, _, W, _, _, _, _, _, _, W, B, _, _, _, _, _, _],
-            [_, W, _, W, B, W, _, B, _, _, W, B, _, B, _, _, _, _, _],
+            [_, W, _, W, _, W, _, B, _, _, W, _, W, B, _, _, _, _, _],
             [_, W, _, _, W, _, _, B, B, _, _, W, B, _, _, _, _, _, _],
             [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
             [_, W, W, W, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
             [_, B, B, W, _, W, _, _, _, _, _, _, _, _, _, _, _, _, _],
-            [_, B, B, W, W, W, _, _, _, _, _, _, _, _, _, _, _, _, _],
-            [_, _, W, W, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [W, B, B, W, W, W, _, _, _, _, _, _, _, _, _, _, _, _, _],
+            [_, W, W, W, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
             [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
             [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
-            [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
-            [_, _, _, _, _, _, _, _, _, _, B, B, B, W, W, W, _, _, _],
-            [_, _, _, _, _, _, _, _, _, _, B, _, B, W, _, W, _, _, _],
-            [_, _, _, _, _, _, _, _, _, _, B, B, B, W, _, W, _, _, _],
-            [_, _, _, _, _, _, _, _, _, _, B, B, W, W, _, W, W, _, _],
-            [_, _, _, _, _, _, _, _, _, _, B, B, B, B, B, W, _, W, _],
-            [_, _, _, _, _, _, _, _, _, _, B, _, B, B, B, W, W, _, _],
-            [_, _, _, _, _, _, _, _, _, _, B, _, B, B, W, W, W, _, _],
+            [_, _, _, _, _, _, _, _, _, _, _, _, _, B, B, B, _, _, _],
+            [_, _, _, _, _, _, _, _, _, _, B, B, B, W, W, W, B, _, _],
+            [_, _, _, _, _, _, _, _, _, _, B, _, B, W, _, W, B, _, _],
+            [_, _, _, _, _, _, _, _, _, _, B, B, B, W, B, W, B, _, _],
+            [_, _, _, _, _, _, _, _, _, _, B, B, W, W, B, W, W, B, _],
+            [_, _, _, _, _, _, _, _, _, _, B, B, B, B, B, W, B, _, _],
+            [_, _, _, _, _, _, _, _, _, _, B, _, B, B, B, W, W, B, _],
+            [_, _, _, _, _, _, _, _, _, _, B, _, B, B, W, W, W, B, _],
         ]
 
         return bo, _, B, W
@@ -558,3 +558,43 @@ class BoardTest(unittest.TestCase):
         # # Assert correct lower-right groups
         self.assertEqual(bo.count_liberties(11, 13), 14)
         self.assertEqual(bo.count_liberties(14, 13), 13)
+
+    def test_move(self):
+        bo, _, B, W = self.get_test_board_2()
+
+        # Assert cannot move ontop of another piece
+        self.assertRaises(BoardError, bo.move, 1, 1)
+        self.assertRaises(BoardError, bo.move, 4, 3)
+
+        # Assert cannot make suicidal move #1
+        self.assertRaises(BoardError, bo.move, 5, 3)
+
+        # Assert legal move works
+        self.assertEqual(bo.turn, 'Black')
+        bo.move(12, 3)
+        self.assertEqual(bo.turn, 'White')
+        self.assertEqual(bo.score, {
+            'black': 1,
+            'white': 0,
+        })
+        self.assertEqual(bo._redo, [])
+
+        # Assert cannot make redundant move
+        self.assertRaises(BoardError, bo.move, 13, 2)
+
+        # Assert cannot make suicidal move #2
+        self.assertRaises(BoardError, bo.move, 12, 14)
+
+        # Assert more legal moves work
+        bo.move(1, 7)
+        self.assertEqual(bo.turn, 'Black')
+        self.assertEqual(bo.score, {
+            'black': 1,
+            'white': 4,
+        })
+        bo.move(15, 14)
+        self.assertEqual(bo.turn, 'White')
+        self.assertEqual(bo.score, {
+            'black': 18,
+            'white': 4,
+        })
