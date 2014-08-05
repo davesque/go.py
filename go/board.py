@@ -220,7 +220,7 @@ class Board(Array):
 
     def _get_group(self, x, y, traversed):
         """
-        Recursively traverses adjascent locations of the same color to find all
+        Recursively traverses adjacent locations of the same color to find all
         locations which are members of the same group.
         """
         loc = self[x, y]
@@ -273,7 +273,7 @@ class Board(Array):
 
     def _get_liberties(self, x, y, traversed):
         """
-        Recursively traverses adjascent locations of the same color to find all
+        Recursively traverses adjacent locations of the same color to find all
         surrounding liberties for the group at the given coordinates.
         """
         loc = self[x, y]
