@@ -12,6 +12,13 @@ A text-based go game written in python.
       -h, --help            show this help message and exit
       -s SIZE, --size SIZE  Size of board.
 
+## Controls
+    
+    Standard WASD for cursor moving
+    SPACE for move
+    U for undo
+    R for redo
+
 ## License
 
 Please take a moment to review the software license as specified in the
