@@ -7,8 +7,8 @@ class LocationError(Exception):
 
 class Location(object):
     TYPES = {
-        'black': bold('@'),
-        'white': bold('O'),
+        'black': bold('*'),
+        'white': bold('o'),
         'empty': '.',
     }
 

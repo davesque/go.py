@@ -54,12 +54,12 @@ def main():
     # Action keymap
     KEYS = {
         'w': view.cursor_up,
-        'r': view.cursor_down,
+        's': view.cursor_down,
         'a': view.cursor_left,
-        's': view.cursor_right,
-        'x': move,
+        'd': view.cursor_right,
+        ' ': move,
         'u': undo,
-        'e': redo,
+        'r': redo,
         '\x1b': exit,
     }
 
