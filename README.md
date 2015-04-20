@@ -13,11 +13,8 @@ A text-based go game written in python.
       -s SIZE, --size SIZE  Size of board.
 
 ## Controls
-    
-    Standard WASD for cursor moving
-    SPACE for move
-    U for undo
-    R for redo
+
+Standard `W`, `A`, `S`, and `D` to move the cursor.  `SPACE` to make a move.  `U` to undo.  `R` to redo.
 
 ## License
 
